@@ -283,9 +283,7 @@ req:
 ``` json
 { 
     "token":"94091781-F29B-4301-80B0-F0CF6BA103E7",
-    "parameters": {
-        "chatId": 3
-    }
+    "parameters": { }
 }
 ```
 res:
