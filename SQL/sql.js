@@ -5,7 +5,7 @@ const connection = mysql.createConnection({
   host: "localhost",
   user: "user",
   database: "arrle",
-  password: "123456"
+  password: "123"
 });
 
 connection.connect(function(err){
@@ -18,7 +18,7 @@ connection.connect(function(err){
  });
 
 const hostname = 'localhost';
-const port = 4000;
+const port = 4001;
 
 const server = http.createServer((req, res) => {
     try {

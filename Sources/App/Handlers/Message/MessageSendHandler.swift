@@ -26,7 +26,7 @@ struct MessageSendHandler: IRequestHandler {
                         message: DBMessageRaw(
                             author_id: info.identifier,
                             chat_id: parameters.input.chatId,
-                            date: Int(Date.timeIntervalSinceReferenceDate),
+                            date: UInt(Date.timeIntervalSinceReferenceDate),
                             body: parameters.input.content,
                             type: parameters.input.type
                         )

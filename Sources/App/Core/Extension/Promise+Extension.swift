@@ -1,6 +1,9 @@
 import Foundation
 import PromiseKit
 import Vapor
+#if canImport(FoundationNetworking)
+    import FoundationNetworking
+#endif
 
 extension URLSession {
     func dataPromise(with urlRequest: URLRequest) -> Promise<Data> {
