@@ -6,7 +6,11 @@ protocol IRequestHandler {
 
     var name: String { get }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) -> Promise<Output>
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) -> Result
+}
+
+extension IRequestHandler {
+    typealias Result = Promise<Output>
 }
 
 struct AuthorisationInfo {

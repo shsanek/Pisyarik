@@ -5,6 +5,12 @@ struct ChatMakeHandler: IRequestHandler {
     var name: String {
         return "chat/make"
     }
+    
+    let isPersonal: Bool
+    
+    init(isPersonal: Bool = false) {
+        self.isPersonal = isPersonal
+    }
 
     func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) -> Promise<Output> {
         parameters.onlyLogin.map { result -> Void in
@@ -20,7 +26,7 @@ struct ChatMakeHandler: IRequestHandler {
             }
             return Void()
         }.then { _ in
-            dataBase.run(request: DBAddChatRequest(name: parameters.input.name))
+            dataBase.run(request: DBAddChatRequest(name: parameters.input.name, isPersonal: isPersonal ? 1 : 0))
         }.only.then { chat -> Promise<Output> in
             parameters.getUser.then { info in
                 dataBase.run(

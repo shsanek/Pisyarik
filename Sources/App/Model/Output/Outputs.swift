@@ -26,6 +26,7 @@ struct ChatsOutput: Codable {
     struct Chat: Codable {
         let name: String
         let chatId: IdentifierType
+        let isPersonal: Bool
         let message: MessagesOutput.Message?
     }
     
@@ -39,6 +40,7 @@ extension ChatsOutput {
                 ChatsOutput.Chat(
                     name: $0.content1.name,
                     chatId: $0.identifier,
+                    isPersonal: $0.content1.is_personal != 0,
                     message: $0.content2.flatMap { MessagesOutput.Message($0, authorisationInfo: authorisationInfo) }
                 )
             }

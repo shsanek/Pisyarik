@@ -59,3 +59,5 @@ CREATE TABLE `token` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 ALTER TABLE chat ADD CONSTRAINT FOREIGN KEY (`last_message_id`) REFERENCES `message` (`identifier`);
+
+ALTER TABLE chat ADD COLUMN is_personal BOOLEAN NOT NULL DEFAULT 0;

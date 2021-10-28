@@ -257,6 +257,7 @@ res:
 ``` json
     Output {
         "chatId": IdentifierType
+        "user": User
     }
 ```
 ###### example:
@@ -276,7 +277,12 @@ res:
 {
     "state": "ok",
     "content": {
-        "chatId": 5
+        "chatId": 5,
+        "user": {
+            "name": "alex10",
+            "userId": 1,
+            "isSelf": true
+        }
     }
 }
 ```
@@ -329,7 +335,8 @@ res:
         chats: [ {
             message: Message?, //последние сообщение в чате
             name: String,
-            chatId: IdentifierType
+            chatId: IdentifierType,
+            isPersonal: Bool // пометка о том что чат персональный ( в такие чаты нельзя добавить пользователей и их имя надо получать из списка пользователей чата)
         }]
     }
 ```
@@ -352,6 +359,7 @@ res:
             {
                 "name": "Alex-Nikita3",
                 "chatId": 1,
+                "isPersonal": false,
                 "message": {
                     "user": {
                         "name": "alex10",
@@ -368,6 +376,7 @@ res:
             {
                 "name": "Alex-Nikit3",
                 "chatId": 2,
+                "isPersonal": false,
                 "message": {
                     "user": {
                         "name": "alex10",

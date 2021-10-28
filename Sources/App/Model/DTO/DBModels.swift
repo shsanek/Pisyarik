@@ -4,6 +4,7 @@ struct DBUserRaw: Decodable {
 
 struct DBChatRaw: Decodable {
     let name: String
+    let is_personal: Int
 }
 
 struct DBTokenRaw: Decodable {
