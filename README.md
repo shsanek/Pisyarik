@@ -362,6 +362,8 @@ res:
                 "name": "Alex-Nikita3",
                 "chatId": 1,
                 "isPersonal": false,
+                "notReadCount": 0,
+                "lastMessageId": 1,
                 "message": {
                     "user": {
                         "name": "alex10",
@@ -381,6 +383,8 @@ res:
                 "name": "Alex-Nikit3",
                 "chatId": 2,
                 "isPersonal": false,
+                "notReadCount": 0,
+                "lastMessageId": 3,
                 "message": {
                     "user": {
                         "name": "alex10",
@@ -391,9 +395,7 @@ res:
                     "messageId": 3,
                     "chatId": 2,
                     "type": "SYSTEM_TEXT",
-                    "date": 657101132,
-                    "notReadCount": 0,
-                    "lastMessageId": 3
+                    "date": 657101132
                 }
             }
         ]
