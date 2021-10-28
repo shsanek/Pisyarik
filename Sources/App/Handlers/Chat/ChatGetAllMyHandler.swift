@@ -10,7 +10,7 @@ struct ChatGetAllMyHandler: IRequestHandler {
         parameters.getUser.then { info in
             dataBase.run(request: DBGetChatRequest(userId: info.identifier))
         }.map { result in
-            ChatsOutput(result)
+            ChatsOutput(result, authorisationInfo: parameters.authorisationInfo)
         }
     }
 }

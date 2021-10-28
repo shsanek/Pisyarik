@@ -22,7 +22,7 @@ struct ChatGetUsersHandler: IRequestHandler {
         }).then { _ in
             dataBase.run(request: DBGetUserRequest(chatId: parameters.input.chatId))
         }.map { result in
-            UsersOutput(result)
+            UsersOutput(result, authorisationInfo: parameters.authorisationInfo)
         }
     }
 }

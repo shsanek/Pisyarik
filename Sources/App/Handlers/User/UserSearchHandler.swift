@@ -9,7 +9,7 @@ struct UserSearchHandler: IRequestHandler {
         parameters.onlyLogin.then { parameters in
             dataBase.run(request: DBGetUserRequest(contains: parameters.input.name))
         }.map { result in
-            UsersOutput(result)
+            UsersOutput(result, authorisationInfo: parameters.authorisationInfo)
         }
     }
 }

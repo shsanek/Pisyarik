@@ -35,7 +35,7 @@ struct MessageGetFromChat: IRequestHandler  {
                 )
             )
         }.map {
-            MessagesOutput($0)
+            MessagesOutput($0, authorisationInfo: parameters.authorisationInfo)
         }
     }
 }

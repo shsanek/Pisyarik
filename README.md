@@ -47,6 +47,7 @@ IdentifierType = UInt
 User {
     name: String
     userId: IdentifierType
+    isSelf: Bool // true - если вы этот пользователь
 }
 
 Message {
@@ -171,27 +172,33 @@ res:
         "users": [
             {
                 "name": "alex",
-                "userId": 1
+                "userId": 1,
+                "isSelf": true
             },
             {
                 "name": "alex2",
-                "userId": 2
+                "userId": 2,
+                "isSelf": false
             },
             {
                 "name": "alex3",
-                "userId": 3
+                "userId": 3,
+                "isSelf": false
             },
             {
                 "name": "alex4",
-                "userId": 4
+                "userId": 4,
+                "isSelf": false
             },
             {
                 "name": "alex6",
-                "userId": 5
+                "userId": 5,
+                "isSelf": false
             },
             {
                 "name": "alex8",
-                "userId": 6
+                "userId": 6,
+                "isSelf": false
             }
         ]
     }
@@ -348,7 +355,8 @@ res:
                 "message": {
                     "user": {
                         "name": "alex10",
-                        "userId": 1
+                        "userId": 1,
+                        "isSelf": true
                     },
                     "body": "Start chat",
                     "messageId": 2,
@@ -363,7 +371,8 @@ res:
                 "message": {
                     "user": {
                         "name": "alex10",
-                        "userId": 1
+                        "userId": 1,
+                        "isSelf": true
                     },
                     "body": "Start chat",
                     "messageId": 3,
@@ -413,11 +422,13 @@ res:
         "users": [
             {
                 "name": "alex8",
-                "userId": 6
+                "userId": 6,
+                "isSelf": true
             },
             {
                 "name": "alex2",
-                "userId": 2
+                "userId": 2,
+                "isSelf": false
             }
         ]
     }
@@ -509,7 +520,8 @@ res:
             {
                 "user": {
                     "name": "alex8",
-                    "userId": 6
+                    "userId": 6,
+                    "isSelf": false
                 },
                 "body": "Hello",
                 "chatId": 3,
