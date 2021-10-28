@@ -24,10 +24,16 @@ public func configure(_ app: Application) throws {
     rootRouter.registration(handler: ChatGetUsersHandler())
     rootRouter.registration(handler: ChatGetAllMyHandler())
     
-    app.get { request in
-        return UserError.defaultError
+    app.get("**".pathComponents) { request in
+        return UserError.notFoundError
+    }
+    app.post("**".pathComponents) { request in
+        return UserError.notFoundError
     }
     app.post { request in
-        return UserError.defaultError
+        return UserError.notFoundError
+    }
+    app.get { request in
+        return UserError.notFoundError
     }
 }

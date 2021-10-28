@@ -30,7 +30,7 @@ struct DBFullMessageRaw: Codable {
     let body: String
     let date: UInt
     let type: String
-    let identifier: IdentifierType
+    let message_id: IdentifierType
 }
 
 typealias IdentifierType = UInt

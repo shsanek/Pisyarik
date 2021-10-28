@@ -1,14 +1,15 @@
 
-DROP TABLE 'token';
-DROP TABLE 'message';
-DROP TABLE 'chat_user';
-DROP TABLE 'user';
-DROP TABLE 'chat';
-DROP TABLE 'version';
+DROP TABLE token;
+DROP TABLE message;
+DROP TABLE chat_user;
+DROP TABLE user;
+DROP TABLE chat;
+DROP TABLE version;
 
 CREATE TABLE `chat` (
   `identifier` int unsigned NOT NULL AUTO_INCREMENT,
   `name` char(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `last_message_id` int unsigned,
   PRIMARY KEY (`identifier`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -56,3 +57,5 @@ CREATE TABLE `token` (
   KEY `user_id` (`user_id`),
   CONSTRAINT `token_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`identifier`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+ALTER TABLE chat ADD CONSTRAINT FOREIGN KEY (`last_message_id`) REFERENCES `message` (`identifier`);

@@ -49,6 +49,15 @@ User {
     userId: IdentifierType
 }
 
+Message {
+    user: User
+    date: UInt
+    body: String
+    type: String
+    messageId: IdentifierType
+    chatId: IdentifierType
+}
+
 # Методы
 
 можно post или get
@@ -89,7 +98,7 @@ res:
     "state": "ok",
     "content": {
         "token": "202C394B-D55E-421B-8172-B28DEB98EC24",
-        userId: 4
+        "userId": 4
     }
 }
 ```
@@ -311,6 +320,7 @@ res:
 ``` json
     Output {
         chats: [ {
+            message: Message?, //последние сообщение в чате
             name: String,
             chatId: IdentifierType
         }]
@@ -329,18 +339,41 @@ res:
 
 ``` json
 {
-"state": "ok",
-"content": {
-    "chats": [
-        {
-            "name": "Alex-Nikita2",
-            "chatId": 3
-        },
-        {
-            "name": "govnoa",
-            "chatId": 4
-        }
-    ]
+    "state": "ok",
+    "content": {
+        "chats": [
+            {
+                "name": "Alex-Nikita3",
+                "chatId": 1,
+                "message": {
+                    "user": {
+                        "name": "alex10",
+                        "userId": 1
+                    },
+                    "body": "Start chat",
+                    "messageId": 2,
+                    "chatId": 1,
+                    "type": "SYSTEM_TEXT",
+                    "date": 657101002
+                }
+            },
+            {
+                "name": "Alex-Nikit3",
+                "chatId": 2,
+                "message": {
+                    "user": {
+                        "name": "alex10",
+                        "userId": 1
+                    },
+                    "body": "Start chat",
+                    "messageId": 3,
+                    "chatId": 2,
+                    "type": "SYSTEM_TEXT",
+                    "date": 657101132
+                }
+            }
+        ]
+    }
 }
 ```
 
@@ -449,14 +482,7 @@ res:
 
 ``` json
    Output: Codable {
-        messages: [{
-            user: User
-            date: UInt
-            body: String
-            type: String
-            messageId: IdentifierType
-            chatId: IdentifierType
-        }]
+        messages: [Message]
     }
 ```
 

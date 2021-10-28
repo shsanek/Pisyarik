@@ -16,6 +16,18 @@ extension UserError {
         }
         """
     }
+
+    static var notFoundError: String {
+        """
+        {
+            "status": "error",
+            "errors": [{
+                "name": "Method not found",
+                "description": "Method not found"
+            }]
+        }
+        """
+    }
 }
 
 extension UserError: Error, UserErrorHandable{
