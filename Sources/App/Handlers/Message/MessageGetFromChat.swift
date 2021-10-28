@@ -31,7 +31,8 @@ struct MessageGetFromChat: IRequestHandler  {
                 request: DBGetMessage(
                     limit: max(100, parameters.input.limit),
                     chatId: parameters.input.chatId,
-                    lastMessage: parameters.input.lastMessageId
+                    lastMessage: parameters.input.lastMessageId,
+                    reverse: parameters.input.reverse ?? false
                 )
             )
         }.map {
@@ -45,5 +46,6 @@ extension MessageGetFromChat {
         let chatId: IdentifierType
         let limit: Int
         let lastMessageId: IdentifierType?
+        let reverse: Bool?
     }
 }

@@ -24,6 +24,7 @@ public func configure(_ app: Application) throws {
     rootRouter.registration(handler: ChatGetUsersHandler())
     rootRouter.registration(handler: ChatGetAllMyHandler())
     rootRouter.registration(handler: ChatMakePersonalHandler())
+    rootRouter.registration(handler: MessageSetReadMark())
 
     app.get("**".pathComponents) { request in
         return UserError.notFoundError

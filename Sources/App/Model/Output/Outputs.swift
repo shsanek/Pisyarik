@@ -28,6 +28,8 @@ struct ChatsOutput: Codable {
         let chatId: IdentifierType
         let isPersonal: Bool
         let message: MessagesOutput.Message?
+        let lastMessageId: IdentifierType?
+        let notReadCount: Int
     }
     
     let chats: [Chat]
@@ -41,7 +43,9 @@ extension ChatsOutput {
                     name: $0.content1.name,
                     chatId: $0.identifier,
                     isPersonal: $0.content1.is_personal != 0,
-                    message: $0.content2.flatMap { MessagesOutput.Message($0, authorisationInfo: authorisationInfo) }
+                    message: $0.content2.flatMap { MessagesOutput.Message($0, authorisationInfo: authorisationInfo) },
+                    lastMessageId: $0.content1.last_read_message_id,
+                    notReadCount: $0.content1.not_read_message_count ?? 0
                 )
             }
         )
@@ -52,7 +56,7 @@ struct MessagesOutput: Codable {
     struct Message: Codable {
         let user: UsersOutput.User
         let date: UInt
-        let body: String
+        let content: String
         let type: String
         let messageId: IdentifierType
         let chatId: IdentifierType
@@ -69,7 +73,7 @@ extension MessagesOutput.Message {
                 isSelf: authorisationInfo?.identifier == raw.author_id
             ),
             date: raw.date,
-            body: raw.body,
+            content: raw.body,
             type: raw.type,
             messageId: raw.message_id,
             chatId: raw.chat_id

@@ -5,6 +5,8 @@ struct DBUserRaw: Decodable {
 struct DBChatRaw: Decodable {
     let name: String
     let is_personal: Int
+    let not_read_message_count: Int?
+    let last_read_message_id: IdentifierType?
 }
 
 struct DBTokenRaw: Decodable {

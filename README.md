@@ -332,11 +332,13 @@ res:
 
 ``` json
     Output {
-        chats: [ {
+        chats: [{
             message: Message?, //последние сообщение в чате
             name: String,
             chatId: IdentifierType,
-            isPersonal: Bool // пометка о том что чат персональный ( в такие чаты нельзя добавить пользователей и их имя надо получать из списка пользователей чата)
+            isPersonal: Bool // пометка о том что чат персональный ( в такие чаты нельзя добавить пользователей и их имя надо получать из списка пользователей чата),
+            notReadCount: Int
+            lastMessageId: Int
         }]
     }
 ```
@@ -366,11 +368,13 @@ res:
                         "userId": 1,
                         "isSelf": true
                     },
-                    "body": "Start chat",
+                    "content": "Start chat",
                     "messageId": 2,
                     "chatId": 1,
                     "type": "SYSTEM_TEXT",
-                    "date": 657101002
+                    "date": 657101002,
+                    "notReadCount": 0,
+                    "lastMessageId": 3
                 }
             },
             {
@@ -383,11 +387,13 @@ res:
                         "userId": 1,
                         "isSelf": true
                     },
-                    "body": "Start chat",
+                    "content": "Start chat",
                     "messageId": 3,
                     "chatId": 2,
                     "type": "SYSTEM_TEXT",
-                    "date": 657101132
+                    "date": 657101132,
+                    "notReadCount": 0,
+                    "lastMessageId": 3
                 }
             }
         ]
@@ -488,6 +494,46 @@ res:
 }
 ```
 
+### message/set_read
+
+Помечает сообщение прочитаным (предыдущие сообщения также будут считаться прочитанами)
+
+``` json
+    Input {
+        messageId: IdentifierType
+        chatId: IdentifierType
+    }
+```
+
+``` json
+    Output {
+        count: Int // сколько осталось не прочитаных сообщений
+    }
+```
+
+###### example:
+req:
+
+``` json
+{ 
+    "token":"94091781-F29B-430",
+    "parameters": {
+        "messageId": 3,
+        "chatId": 2
+    }
+}
+```
+res:
+
+``` json
+{
+    "state": "ok",
+    "content": {
+        "count": 0
+    }
+}
+```
+
 ### message/get_from_chat
 
 Выгружает сообщения из чата начиная с последних
@@ -496,7 +542,8 @@ res:
     Input {
         chatId: IdentifierType // из какого чата
         limit: Int // сколько грузить max(100)
-        lastMessageId: IdentifierType? // id последнего загруженного сообщения ( какое сообщение послдение загрузили в прошлый раз)
+        lastMessageId: IdentifierType? // id последнего загруженного сообщения ( какое сообщение послдение загрузили в прошлый раз),
+        reverse: Bool? // инвертирует сортировку начинает грузить с первого сообщения (или то сообщение которое после lastMessageId)
     }
 ```
 
@@ -532,7 +579,7 @@ res:
                     "userId": 6,
                     "isSelf": false
                 },
-                "body": "Hello",
+                "content": "Hello",
                 "chatId": 3,
                 "type": "text",
                 "messageId": 1,

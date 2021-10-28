@@ -1,10 +1,13 @@
+ALTER TABLE chat DROP CONSTRAINT chat_lmi_1;
+ALTER TABLE chat_user DROP CONSTRAINT chat_user_lrmi_1;
 
+DROP TABLE chat_user;
+DROP TABLE version;
 DROP TABLE token;
 DROP TABLE message;
-DROP TABLE chat_user;
-DROP TABLE user;
 DROP TABLE chat;
-DROP TABLE version;
+DROP TABLE user;
+
 
 CREATE TABLE `chat` (
   `identifier` int unsigned NOT NULL AUTO_INCREMENT,
@@ -58,6 +61,10 @@ CREATE TABLE `token` (
   CONSTRAINT `token_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`identifier`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-ALTER TABLE chat ADD CONSTRAINT FOREIGN KEY (`last_message_id`) REFERENCES `message` (`identifier`);
-
+ALTER TABLE chat ADD CONSTRAINT chat_lmi_1 FOREIGN KEY (`last_message_id`) REFERENCES `message` (`identifier`);
 ALTER TABLE chat ADD COLUMN is_personal BOOLEAN NOT NULL DEFAULT 0;
+
+ALTER TABLE chat ADD COLUMN message_count INT UNSIGNED NOT NULL DEFAULT 0;
+ALTER TABLE chat_user ADD COLUMN last_read_message_id INT UNSIGNED DEFAULT NULL;
+ALTER TABLE chat_user ADD CONSTRAINT chat_user_lrmi_1 FOREIGN KEY (`last_read_message_id`) REFERENCES `message` (`identifier`);
+ALTER TABLE chat_user ADD COLUMN not_read_message_count INT UNSIGNED DEFAULT 0;
