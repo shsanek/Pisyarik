@@ -52,7 +52,7 @@ extension MessageGetFromChat {
             let date: UInt
             let body: String
             let type: String
-            let identifier: IdentifierType
+            let messageId: IdentifierType
             let chatId: IdentifierType
         }
         let messages: [Message]
@@ -65,12 +65,12 @@ extension MessageGetFromChat.Output {
             return .init(
                 user: .init(
                     name: raw.content.author_name,
-                    identifier: raw.content.author_id
+                    userId: raw.content.author_id
                 ),
                 date: raw.content.date,
                 body: raw.content.body,
                 type: raw.content.type,
-                identifier: raw.identifier,
+                messageId: raw.identifier,
                 chatId: raw.content.chat_id
             )
         }

@@ -11,6 +11,11 @@ extension DBGetUserRequest {
         self.request = "SELECT * FROM user WHERE name = '\(name)';"
     }
     
+    init(userId: IdentifierType) {
+        self.description = "Get user with name '\(userId)'"
+        self.request = "SELECT * FROM user WHERE identifier = \(userId);"
+    }
+    
     init(token: String) {
         self.description = "Get user with token '\(token)'"
         self.request = "SELECT user.identifier as identifier, user.name as name FROM token, user WHERE token.user_id = user.identifier AND token.token = '\(token)';"

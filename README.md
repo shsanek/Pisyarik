@@ -46,7 +46,7 @@ IdentifierType = UInt
 
 User {
     name: String
-    identifier: IdentifierType
+    userId: IdentifierType
 }
 
 # Методы
@@ -67,7 +67,8 @@ User {
 
 ``` json
     Output {
-        token: String
+        token: String,
+        userId: Int
     }
 ```
 
@@ -87,7 +88,8 @@ res:
 {
     "state": "ok",
     "content": {
-        "token": "202C394B-D55E-421B-8172-B28DEB98EC24"
+        "token": "202C394B-D55E-421B-8172-B28DEB98EC24",
+        userId: 4
     }
 }
 ```
@@ -160,27 +162,27 @@ res:
         "users": [
             {
                 "name": "alex",
-                "identifier": 1
+                "userId": 1
             },
             {
                 "name": "alex2",
-                "identifier": 2
+                "userId": 2
             },
             {
                 "name": "alex3",
-                "identifier": 3
+                "userId": 3
             },
             {
                 "name": "alex4",
-                "identifier": 4
+                "userId": 4
             },
             {
                 "name": "alex6",
-                "identifier": 5
+                "userId": 5
             },
             {
                 "name": "alex8",
-                "identifier": 6
+                "userId": 6
             }
         ]
     }
@@ -212,6 +214,43 @@ req:
     "token":"94091781-F29B-4301-80B0-F0CF6BA103E7",
     "parameters": {
         "name": "Alex-Nikita3"
+    }
+}
+```
+res:
+
+``` json
+{
+    "state": "ok",
+    "content": {
+        "chatId": 5
+    }
+}
+```
+
+### chat/make_personal
+
+Создаем чат c пользователем
+
+``` json
+    Input {
+        userId: IdentifierType
+    }
+```
+
+``` json
+    Output {
+        "chatId": IdentifierType
+    }
+```
+###### example:
+req:
+
+``` json
+{ 
+    "token":"94091781-F29B-4301-80B0-F0CF6BA103E7",
+    "parameters": {
+        "userId": 3
     }
 }
 ```
@@ -273,7 +312,7 @@ res:
     Output {
         chats: [ {
             name: String,
-            identifier: IdentifierType
+            chatId: IdentifierType
         }]
     }
 ```
@@ -295,11 +334,11 @@ res:
     "chats": [
         {
             "name": "Alex-Nikita2",
-            "identifier": 3
+            "chatId": 3
         },
         {
             "name": "govnoa",
-            "identifier": 4
+            "chatId": 4
         }
     ]
 }
@@ -341,11 +380,11 @@ res:
         "users": [
             {
                 "name": "alex8",
-                "identifier": 6
+                "userId": 6
             },
             {
                 "name": "alex2",
-                "identifier": 2
+                "userId": 2
             }
         ]
     }
@@ -415,7 +454,7 @@ res:
             date: UInt
             body: String
             type: String
-            identifier: IdentifierType
+            messageId: IdentifierType
             chatId: IdentifierType
         }]
     }
@@ -444,12 +483,12 @@ res:
             {
                 "user": {
                     "name": "alex8",
-                    "identifier": 6
+                    "userId": 6
                 },
                 "body": "Hello",
                 "chatId": 3,
                 "type": "text",
-                "identifier": 1,
+                "messageId": 1,
                 "date": 657047168
             }
         ]

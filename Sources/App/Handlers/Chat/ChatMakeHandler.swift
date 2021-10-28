@@ -23,7 +23,24 @@ struct ChatMakeHandler: IRequestHandler {
             dataBase.run(request: DBAddChatRequest(name: parameters.input.name))
         }.only.then { chat -> Promise<Output> in
             parameters.getUser.then { info in
-                dataBase.run(request: DBAddUserInChatRequest(userId: info.identifier, chatId: chat.identifier))
+                dataBase.run(
+                    request: DBAddUserInChatRequest(
+                        userId: info.identifier,
+                        chatId: chat.identifier
+                    )
+                ).then { _ in
+                    dataBase.run(
+                        request: DBAddMessageRequest(
+                            message: DBMessageRaw(
+                                author_id: info.identifier,
+                                chat_id: chat.identifier,
+                                date: UInt(Date.timeIntervalSinceReferenceDate),
+                                body: "Start chat",
+                                type: "SYSTEM_TEXT"
+                            )
+                        )
+                    )
+                }
             }.map { _ in
                 Output(chatId: chat.identifier)
             }

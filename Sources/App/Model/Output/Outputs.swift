@@ -1,7 +1,7 @@
 struct UsersOutput: Codable {
     struct User: Codable {
         let name: String
-        let identifier: IdentifierType
+        let userId: IdentifierType
     }
     
     let users: [User]
@@ -13,7 +13,7 @@ extension UsersOutput {
             users: users.map {
                 UsersOutput.User(
                     name: $0.content.name,
-                    identifier: $0.identifier
+                    userId: $0.identifier
                 )
             }
         )
@@ -23,7 +23,7 @@ extension UsersOutput {
 struct ChatsOutput: Codable {
     struct Chat: Codable {
         let name: String
-        let identifier: IdentifierType
+        let chatId: IdentifierType
     }
     
     let chats: [Chat]
@@ -35,7 +35,7 @@ extension ChatsOutput {
             chats: chats.map {
                 ChatsOutput.Chat(
                     name: $0.content.name,
-                    identifier: $0.identifier
+                    chatId: $0.identifier
                 )
             }
         )

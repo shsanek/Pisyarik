@@ -22,9 +22,11 @@ struct UserLoginHandler: IRequestHandler {
                             user_id: user.identifier
                         )
                     )
-                )
-            }.map { _ in
-                return Output(token: uuid)
+                ).map { _ in
+                    return user
+                }
+            }.map { user in
+                return Output(token: uuid, userId: user.identifier)
             }
             
     }
@@ -37,5 +39,6 @@ extension UserLoginHandler {
     
     struct Output: Codable {
         let token: String
+        let userId: IdentifierType
     }
 }
