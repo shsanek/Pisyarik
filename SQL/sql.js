@@ -5,7 +5,8 @@ const connection = mysql.createConnection({
   host: "localhost",
   user: "user",
   database: "arrle",
-  password: "123"
+  password: "123456",
+  multipleStatements: true
 });
 
 connection.connect(function(err){
@@ -45,6 +46,14 @@ const server = http.createServer((req, res) => {
                   return
                 }
                 if (Array.isArray(results)) {
+                  if (results.length > 0 && Array.isArray(results[results.length - 1])) {
+                    data = {
+                      result: "ok",
+                      content: results[results.length - 1]
+                    }
+                    res.end(JSON.stringify(data));
+                    return
+                  }
                   data = {
                     result: "ok",
                     content: results

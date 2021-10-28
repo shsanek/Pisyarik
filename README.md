@@ -367,7 +367,9 @@ res:
 ```
 
 ``` json
-    Output {}
+    Output {
+        messageId: IdentifierType
+    }
 ```
 
 ###### example:
@@ -388,7 +390,9 @@ res:
 ``` json
 {
     "state": "ok",
-    "content": {}
+    "content": {
+        "messageId": 7
+    }
 }
 ```
 

@@ -6,7 +6,7 @@ struct MessageSendHandler: IRequestHandler {
         "message/send"
     }
     
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) -> Promise<EmptyRaw> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) -> Promise<Output> {
         return parameters.getUser.then { info in
             dataBase.run(
                 request: DBGetContainsUserInChat(
@@ -33,8 +33,8 @@ struct MessageSendHandler: IRequestHandler {
                     )
                 )
             }
-        }.map { _ in
-            EmptyRaw()
+        }.only.map { result in
+            Output(messageId: result.identifier)
         }
     }
 }
@@ -45,5 +45,7 @@ extension MessageSendHandler {
         let type: String
         let content: String
     }
-    typealias Output = EmptyRaw
+    struct Output: Codable {
+        let messageId: IdentifierType
+    }
 }

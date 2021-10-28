@@ -16,7 +16,7 @@ struct UserLoginHandler: IRequestHandler {
             .firstValue
             .then { user in
                 return dataBase.run(
-                    request: DBMakeTokenForUserRequest(
+                    request: DBAddTokenForUserRequest(
                         token: DBTokenRaw(
                             token: uuid,
                             user_id: user.identifier

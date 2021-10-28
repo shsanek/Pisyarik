@@ -21,8 +21,6 @@ struct ChatMakeHandler: IRequestHandler {
             return Void()
         }.then { _ in
             dataBase.run(request: DBAddChatRequest(name: parameters.input.name))
-        }.then { _ in
-            dataBase.run(request: DBGetChatRequest(name: parameters.input.name))
         }.only.then { chat -> Promise<Output> in
             parameters.getUser.then { info in
                 dataBase.run(request: DBAddUserInChatRequest(userId: info.identifier, chatId: chat.identifier))

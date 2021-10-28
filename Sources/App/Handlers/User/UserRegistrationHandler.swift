@@ -18,7 +18,7 @@ struct UserRegistrationHandler: IRequestHandler {
             }
             return Void()
         }.then { _ in
-            dataBase.run(request: DBMakeUserWithNameRequest(name: parameters.input.name))
+            dataBase.run(request: DBAddUserWithNameRequest(name: parameters.input.name))
         }.map { _ in
             EmptyRaw()
         }

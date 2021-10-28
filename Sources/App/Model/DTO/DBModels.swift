@@ -34,3 +34,7 @@ struct DBFullMessageRaw: Codable {
 }
 
 typealias IdentifierType = UInt
+
+struct DBIdentifier: Codable {
+    let identifier: IdentifierType
+}
