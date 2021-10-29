@@ -89,3 +89,7 @@ fastlane/test_output
 
 iOSInjectionProject/
 SQL/node_modules
+proxy/node_modules
+proxy/package-lock.json
+proxy/package.json
+proxy/key
