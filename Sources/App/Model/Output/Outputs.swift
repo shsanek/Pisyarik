@@ -29,24 +29,30 @@ struct ChatsOutput: Codable {
         let isPersonal: Bool
         let message: MessagesOutput.Message?
         let lastMessageId: IdentifierType?
-        let notReadCount: Int
+        let notReadCount: Int?
     }
     
     let chats: [Chat]
+}
+
+extension ChatsOutput.Chat {
+    init(_ raw: DBContainer2<DBChatRaw, DBFullMessageRaw>, authorisationInfo: AuthorisationInfo?){
+        self = ChatsOutput.Chat(
+            name: raw.content1.name,
+            chatId: raw.identifier,
+            isPersonal: raw.content1.is_personal != 0,
+            message: raw.content2.flatMap { MessagesOutput.Message($0, authorisationInfo: authorisationInfo) },
+            lastMessageId: raw.content1.last_read_message_id,
+            notReadCount: raw.content1.not_read_message_count ?? 0
+        )
+    }
 }
 
 extension ChatsOutput {
     init(_ chats: [DBContainer2<DBChatRaw, DBFullMessageRaw>], authorisationInfo: AuthorisationInfo?){
         self = ChatsOutput(
             chats: chats.map {
-                ChatsOutput.Chat(
-                    name: $0.content1.name,
-                    chatId: $0.identifier,
-                    isPersonal: $0.content1.is_personal != 0,
-                    message: $0.content2.flatMap { MessagesOutput.Message($0, authorisationInfo: authorisationInfo) },
-                    lastMessageId: $0.content1.last_read_message_id,
-                    notReadCount: $0.content1.not_read_message_count ?? 0
-                )
+                ChatsOutput.Chat($0, authorisationInfo: authorisationInfo)
             }
         )
     }

@@ -32,19 +32,21 @@ struct ChatAddUserHandler: IRequestHandler {
             }
             return Void()
         }.then { _ in
-            dataBase.run(request: DBGetChatRequest(chatId: parameters.input.chatId)).only.map { result -> Void in
+            dataBase.run(request: DBGetChatRequest(chatId: parameters.input.chatId)).only.map { result -> ChatsOutput.Chat in
                 if result.content1.is_personal != 0 {
                     throw UserError.personalChat
                 }
-                return Void()
+                return .init(result, authorisationInfo: parameters.authorisationInfo)
             }
-        }.then { _ in
+        }.then { chat in
             dataBase.run(
                 request: DBAddUserInChatRequest(
                     userId: parameters.input.userId,
                     chatId: parameters.input.chatId
                 )
-            )
+            ).get { _ in
+                parameters.updateCenter.update(action: .addInNewChat(chat, userId: parameters.input.userId))
+            }
         }.map { _ in
             EmptyRaw()
         }

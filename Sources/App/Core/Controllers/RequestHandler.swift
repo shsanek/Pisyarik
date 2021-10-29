@@ -20,5 +20,6 @@ struct AuthorisationInfo {
 
 struct RequestParameters<Input: Decodable> {
     let authorisationInfo: AuthorisationInfo?
+    let updateCenter: UpdateCenter
     let input: Input
 }

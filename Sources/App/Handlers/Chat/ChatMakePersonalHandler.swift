@@ -13,12 +13,13 @@ struct ChatMakePersonalHandler: IRequestHandler {
             ChatMakeHandler(isPersonal: true).handle(
                 .init(
                     authorisationInfo: parameters.authorisationInfo,
+                    updateCenter: parameters.updateCenter,
                     input: .init(
                         name: "SYS ##\(["\(result.user.identifier)", "\(result.me.identifier)"].sorted(by: >).joined(separator: "-"))##"
                     )
                 ),
                 dataBase: dataBase
-            ).map { (user: result.user, chat: $0) }
+            ).map { (user: result.user, chat: $0, me: result.me) }
         }
         .then { result in
             dataBase.run(
@@ -26,7 +27,21 @@ struct ChatMakePersonalHandler: IRequestHandler {
                     userId: parameters.input.userId,
                     chatId: result.chat.chatId
                 )
-            ).map { _ in
+            ).get { _ in
+                parameters.updateCenter.update(
+                    action: .newPersonalChat(
+                        .init(
+                            chatId: result.chat.chatId,
+                            user: .init(
+                                name: result.me.name,
+                                userId: result.me.identifier,
+                                isSelf: false
+                            )
+                        ),
+                        userId: result.user.identifier
+                    )
+                )
+            }.map { _ in
                 Output(
                     chatId: result.chat.chatId,
                     user: .init(

@@ -7,6 +7,7 @@ struct MessageSendHandler: IRequestHandler {
     }
     
     func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) -> Promise<Output> {
+        let time = UInt(Date.timeIntervalSinceReferenceDate)
         return parameters.getUser.then { info in
             dataBase.run(
                 request: DBGetContainsUserInChat(
@@ -26,14 +27,27 @@ struct MessageSendHandler: IRequestHandler {
                         message: DBMessageRaw(
                             author_id: info.identifier,
                             chat_id: parameters.input.chatId,
-                            date: UInt(Date.timeIntervalSinceReferenceDate),
+                            date: time,
                             body: parameters.input.content,
                             type: parameters.input.type
                         )
                     )
-                )
+                ).only.get { identifier in
+                    parameters.updateCenter.update(
+                        action: .newMessage(
+                            .init(
+                                user: .init(name: info.name, userId: info.identifier, isSelf: false),
+                                date: time,
+                                content: parameters.input.content,
+                                type: parameters.input.type,
+                                messageId: identifier.identifier,
+                                chatId: parameters.input.chatId
+                            )
+                        )
+                    )
+                }
             }
-        }.only.map { result in
+        }.map { result in
             Output(messageId: result.identifier)
         }
     }

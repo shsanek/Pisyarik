@@ -281,7 +281,7 @@ res:
         "user": {
             "name": "alex10",
             "userId": 1,
-            "isSelf": true
+            "isSelf": false
         }
     }
 }
@@ -337,8 +337,8 @@ res:
             name: String,
             chatId: IdentifierType,
             isPersonal: Bool // пометка о том что чат персональный ( в такие чаты нельзя добавить пользователей и их имя надо получать из списка пользователей чата),
-            notReadCount: Int
-            lastMessageId: Int
+            notReadCount: Int?
+            lastMessageId: Int?
         }]
     }
 ```
@@ -592,3 +592,73 @@ res:
 }
 ```
 
+## Update
+
+### update/get
+
+Возращает список обновлений (нужен большой тайм аут > 30)
+
+
+``` json
+    Input {}
+```
+
+
+``` json
+Output {
+    notifications: [{
+        type: string // типо нотификации
+        content: Any // контент этого типа нотификаций
+    }]
+}
+```
+
+##### типы нотификаций
+
+```
+{
+    type: newMessage,
+    content: Message
+}
+```
+
+```
+{
+    type: addedInNewChat,
+    content: {
+        name: String,
+        chatId: IdentifierType,
+        isPersonal: Bool
+    }
+}
+```
+
+```
+{
+    type: newPersonalChat,
+    content: {
+        chatId: IdentifierType,
+        user: User    
+    }
+}
+```
+
+###### example:
+req:
+
+``` json
+{ 
+    "token":"94091781-F29B-430",
+    "parameters": { }
+}
+```
+res:
+
+``` json
+{
+    "state": "ok",
+    "content": {
+        "notification": []
+    }
+}
+```

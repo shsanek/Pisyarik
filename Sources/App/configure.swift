@@ -18,13 +18,16 @@ public func configure(_ app: Application) throws {
     
     rootRouter.registration(handler: MessageGetFromChat())
     rootRouter.registration(handler: MessageSendHandler())
-    
+    rootRouter.registration(handler: MessageSetReadMark())
+
     rootRouter.registration(handler: ChatAddUserHandler())
     rootRouter.registration(handler: ChatMakeHandler())
     rootRouter.registration(handler: ChatGetUsersHandler())
     rootRouter.registration(handler: ChatGetAllMyHandler())
     rootRouter.registration(handler: ChatMakePersonalHandler())
-    rootRouter.registration(handler: MessageSetReadMark())
+    
+    rootRouter.registration(handler: UpdateGetHandler())
+
 
     app.get("**".pathComponents) { request in
         return UserError.notFoundError

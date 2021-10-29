@@ -1,5 +1,7 @@
 ALTER TABLE chat DROP CONSTRAINT chat_lmi_1;
 ALTER TABLE chat_user DROP CONSTRAINT chat_user_lrmi_1;
+ALTER TABLE chat DROP CONSTRAINT chat_ibfk_1;
+ALTER TABLE message DROP CONSTRAINT message_ibfk_1;
 
 DROP TABLE chat_user;
 DROP TABLE version;
@@ -7,7 +9,6 @@ DROP TABLE token;
 DROP TABLE message;
 DROP TABLE chat;
 DROP TABLE user;
-
 
 CREATE TABLE `chat` (
   `identifier` int unsigned NOT NULL AUTO_INCREMENT,

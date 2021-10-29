@@ -3,6 +3,7 @@ import Vapor
 final class RootRouter {
     private let dataBase: IDataBase
     private weak var app: Application?
+    private lazy var updateCenter = UpdateCenter(dataBase: dataBase)
 
     init(dataBase: IDataBase, app: Application) {
         self.dataBase = dataBase
@@ -12,10 +13,10 @@ final class RootRouter {
     func registration<Handler: IRequestHandler>(handler: Handler) {
         let container = RequestHandlerContainer(handler: handler)
         app?.get(handler.name.pathComponents) { request in
-            return container.handle(request, dataBase: self.dataBase)
+            return container.handle(request, dataBase: self.dataBase, updateCenter: self.updateCenter)
         }
         app?.post(handler.name.pathComponents) { request in
-            return container.handle(request, dataBase: self.dataBase)
+            return container.handle(request, dataBase: self.dataBase, updateCenter: self.updateCenter)
         }
     }
 }
