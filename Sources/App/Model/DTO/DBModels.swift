@@ -1,5 +1,7 @@
 struct DBUserRaw: Decodable {
     let name: String
+    let security_hash: String?
+    let secret_key: String?
 }
 
 struct DBChatRaw: Decodable {
@@ -9,8 +11,9 @@ struct DBChatRaw: Decodable {
     let last_read_message_id: IdentifierType?
 }
 
-struct DBTokenRaw: Decodable {
+struct DBTokenRaw: Codable {
     let token: String
+    let secret_key: String
     let user_id: IdentifierType
 }
 

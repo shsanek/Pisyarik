@@ -16,7 +16,8 @@ struct ChatMakePersonalHandler: IRequestHandler {
                     updateCenter: parameters.updateCenter,
                     input: .init(
                         name: "SYS ##\(["\(result.user.identifier)", "\(result.me.identifier)"].sorted(by: >).joined(separator: "-"))##"
-                    )
+                    ),
+                    time: parameters.time
                 ),
                 dataBase: dataBase
             ).map { (user: result.user, chat: $0, me: result.me) }

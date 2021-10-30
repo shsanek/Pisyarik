@@ -5,7 +5,7 @@ struct DBAddTokenForUserRequest: IDBRequest {
         "Insert token for user"
     }
     var request: String {
-        "INSERT INTO token(token, user_id) VALUES ('\(token.token)', \(token.user_id)); SELECT LAST_INSERT_ID () as identifier;"
+        "INSERT INTO token(token, user_id, secret_key) VALUES ('\(token.token)', \(token.user_id), '\(token.secret_key)'); SELECT LAST_INSERT_ID () as identifier;"
     }
     
     let token: DBTokenRaw

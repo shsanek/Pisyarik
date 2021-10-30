@@ -77,6 +77,15 @@ extension Promise where T: RandomAccessCollection {
     }
 }
 
+extension Promise {
+    func handler(_ block: @escaping (T) throws -> Void) -> Promise<T> {
+        self.map { result -> T in
+            try block(result)
+            return result
+        }
+    }
+}
+
 extension EventLoopPromise where Value == String {
     func ok<Output: Encodable>(_ content: Output) {
         let raw = OutputRequestRaw.ok(content)

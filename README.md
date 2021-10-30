@@ -11,7 +11,11 @@
 
 ``` json
 {
-    "token": String?,
+    "time": UInt, // текущие время не должно сильно отличаться от серверного
+    "authorisation": {
+        "token": String
+        "secretKey": String // Берем хэш который собрали в login и делаем так SHA512(hash+time)
+    }?
     "parameters": {
         //тут наш обьект (даже если парметров к запросу нет сюда надо все равно отправитьь пустой обьект) (дальше буду описывать только это поле Input)
     }
@@ -71,13 +75,16 @@ Message {
 
 ``` json
     Input {
-        name: String
+        name: String,
+        securityHash: String // SHA512(name+password),
+        userPublicKey: String // Public part SymmetricKey user for secretKey
     }
 ```
 
 ``` json
     Output {
-        token: String,
+        token: String
+        serverPublicKey: String // Public part SymmetricKey server for secretKey
         userId: Int
     }
 ```
@@ -106,16 +113,22 @@ res:
 
 ### user/registration
 
-Регистрирует пользователя
+Регистрирует пользователя, сразу логинет пользователя
 
 ``` json
     Input {
-        name: String
+        name: String,
+        securityHash: String // SHA512(name+password),
+        userPublicKey: String // Public part SymmetricKey user for secretKey
     }
 ```
 
 ``` json
-    Output {}
+    Output {
+        token: String
+        serverPublicKey: String // Public part SymmetricKey server for secretKey
+        userId: Int
+    }
 ```
 ###### example:
 req:

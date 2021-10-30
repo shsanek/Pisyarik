@@ -69,3 +69,6 @@ ALTER TABLE chat ADD COLUMN message_count INT UNSIGNED NOT NULL DEFAULT 0;
 ALTER TABLE chat_user ADD COLUMN last_read_message_id INT UNSIGNED DEFAULT NULL;
 ALTER TABLE chat_user ADD CONSTRAINT chat_user_lrmi_1 FOREIGN KEY (`last_read_message_id`) REFERENCES `message` (`identifier`);
 ALTER TABLE chat_user ADD COLUMN not_read_message_count INT UNSIGNED DEFAULT 0;
+
+ALTER TABLE user ADD COLUMN `security_hash` char(65) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL;
+ALTER TABLE token ADD COLUMN secret_key char(65) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL;

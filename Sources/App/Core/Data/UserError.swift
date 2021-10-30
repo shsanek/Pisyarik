@@ -2,6 +2,7 @@ struct UserError: Codable {
     let name: String
     let description: String
     let info: String?
+    let code: String = "unknownError"
 }
 
 extension UserError {
