@@ -4,7 +4,7 @@ import Foundation
 final class Listener {
     let promise: Promise<[NotificationOutputContainer]>
 
-    @Locked var active: Bool = false {
+    var active: Bool = false {
         didSet {
             self.update()
         }
@@ -28,14 +28,14 @@ final class Listener {
     
     func append(_ container: NotificationOutputContainer) {
         self.containers.append(container)
-
+        self.update()
     }
     
     private func update() {
         guard self.active else { return }
         if containers.count > 20 {
             task.cancel()
-        } else {
+        } else if containers.count > 0 {
             task.update()
         }
     }
@@ -48,7 +48,7 @@ final class UpdateTask {
     private let updateResolver: Resolver<Void>
     private let cancelResolver: Resolver<Void>
 
-    private let scheduler = Scheduler(defaultDelay: 2)
+    private let scheduler = Scheduler(defaultDelay: 0.5)
     
     init(_ maxTime: Double = 30) {
         let updatePending = Promise<Void>.pending()

@@ -15,7 +15,10 @@ final class UpdateCenter {
         defer {
             lock.unlock()
         }
-        let listener = listeners[id] ?? create(id: id)
+        var listener = listeners[id] ?? create(id: id)
+        if listener.active {
+            listener = create(id: id)
+        }
         listener.active = true
         return listener.promise
     }
@@ -58,11 +61,11 @@ private extension UpdateCenter {
     }
     
     func newPersonalChat(_ output: ChatMakePersonalHandler.Output, userId: IdentifierType) {
-        self.listeners[userId]?.append(.init(NotificationOutput(type: .addedInNewChat, content: output)))
+        self.listeners[userId]?.append(.init(NotificationOutput(type: .newPersonalChat, content: output)))
 
     }
 
     func addInNewChat(_ chat: ChatsOutput.Chat, userId: IdentifierType) {
-        self.listeners[userId]?.append(.init(NotificationOutput(type: .newPersonalChat, content: chat)))
+        self.listeners[userId]?.append(.init(NotificationOutput(type: .addedInNewChat, content: chat)))
     }
 }

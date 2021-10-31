@@ -73,6 +73,7 @@ ALTER TABLE chat_user ADD COLUMN not_read_message_count INT UNSIGNED DEFAULT 0;
 ALTER TABLE user ADD COLUMN `security_hash` char(65) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL;
 ALTER TABLE token ADD COLUMN secret_key char(65) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL;
 
+INSERT INTO user(name, security_hash) VALUES ('system','not_login');
 
 INSERT INTO user(name, security_hash) VALUES ('Den','fb5cc970a18a1f3a14e9b98c337300e99bbe0100507b9a574705cf77f0794eda');
 SET @den_id = LAST_INSERT_ID ();
