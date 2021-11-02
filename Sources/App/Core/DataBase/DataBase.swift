@@ -9,7 +9,7 @@ final class DataBase {
 
     private let address = "http://localhost:4001"
     private let session = URLSession(configuration: .default)
-    
+
     func migration(versions: [SQLVersion]) -> Promise<Void> {
         self.run(request: DBGetVersionRequest()).firstValue.mapResult { (result: Result<DBVersionDTO>) -> Int in
             switch result {
@@ -39,11 +39,11 @@ final class DataBase {
             }
         }
     }
-    
+
     func request<Result: Decodable>(description: String, request: String, type: Result.Type) -> Promise<[Result]> {
         return self.request(description: description, request: request)
     }
-    
+
     func request<Result: Decodable>(description: String, request: String) -> Promise<[Result]> {
         let result = Promise<[Result]>.pending()
         do {
@@ -80,15 +80,14 @@ final class DataBase {
                     userInfo: ["request description": description]
                 )
             }
-        }
-        catch {
+        } catch {
             result.resolver.reject(error)
         }
         return result.promise
     }
 }
 
-extension DataBase: IDataBase {    
+extension DataBase: IDataBase {
     func run<Request: IDBRequest>(request: Request) -> Promise<[Request.Result]> {
         return self.request(description: request.description, request: request.request)
     }
@@ -117,6 +116,7 @@ protocol IDataBase {
 
 protocol IDBRequest {
     associatedtype Result: Decodable
+
     var description: String { get }
     var request: String { get }
 }

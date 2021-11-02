@@ -56,7 +56,7 @@ extension UserRegistrationHandler {
         let securityHash: String
         let userPublicKey: String
     }
-    
+
     struct Output: Codable {
         let token: String
         let serverPublicKey: String

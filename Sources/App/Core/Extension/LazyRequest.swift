@@ -16,7 +16,7 @@ final class LazyRequest<Element> {
         pthread_rwlock_init(&lock, nil)
         promiseMaker = maker
     }
-    
+
     deinit {
         pthread_rwlock_destroy(&lock)
     }

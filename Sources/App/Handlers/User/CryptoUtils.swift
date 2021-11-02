@@ -1,7 +1,7 @@
 import Crypto
 import Foundation
 
-final class CryptoUtils {
+enum CryptoUtils {
     static func generateKey(userPublicKey: String) throws -> (uuid: String, publicKey: String, symmetricKey: String) {
         let uuid = UUID().uuidString
         if #available(macOS 11.0, *) {

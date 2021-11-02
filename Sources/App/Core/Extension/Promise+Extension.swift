@@ -43,7 +43,7 @@ extension Promise {
         }
         return pending.promise
     }
-    
+
     static func when(consistently promises: [Promise<Void>]) -> Promise<Void> {
         guard let first = promises.first else {
             return .value
@@ -53,13 +53,13 @@ extension Promise {
         let handler = {
             _ = when(consistently: Array(promises)).done { _ in
                 result.resolver.fulfill_()
-            }.catch { error in
+            }.catch { _ in
                 result.resolver.fulfill_()
             }
         }
         first.done { _ in
             handler()
-        }.catch { error in
+        }.catch { _ in
             handler()
         }
         return result.promise
@@ -68,7 +68,7 @@ extension Promise {
 
 extension Promise where T: RandomAccessCollection {
     var only: Promise<T.Element> {
-        return self.map { value -> T.Element in
+        self.map { value -> T.Element in
             if value.count == 1, let value = value.first {
                 return value
             }
@@ -96,16 +96,14 @@ extension EventLoopPromise where Value == String {
         let raw = OutputRequestRaw<EmptyRaw>.errors(errors)
         self.send(raw)
     }
-    
+
     private func send<Output: Encodable>(_ value: Output) {
         if
             let outputData = try? JSONEncoder().encode(value),
             let text = String(data: outputData, encoding: .utf8)
         {
             self.succeed(text)
-        }
-        else
-        {
+        } else {
             self.succeed(UserError.defaultError)
         }
     }
@@ -124,7 +122,7 @@ extension RequestParameters {
             return result
         }
     }
-    
+
     var getUser: Promise<AuthorisationInfo> {
         Promise { resolver in
             guard let info = self.authorisationInfo else {

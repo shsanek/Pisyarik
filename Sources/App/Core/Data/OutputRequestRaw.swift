@@ -15,7 +15,7 @@ extension OutputRequestRaw {
 }
 
 extension OutputRequestRaw {
-    enum State: String, Codable  {
+    enum State: String, Codable {
         case ok
         case error
     }

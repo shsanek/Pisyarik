@@ -3,17 +3,17 @@ import Foundation
 
 struct ChatMakeHandler: IRequestHandler {
     var name: String {
-        return "chat/make"
+        "chat/make"
     }
-    
+
     let isPersonal: Bool
-    
+
     init(isPersonal: Bool = false) {
         self.isPersonal = isPersonal
     }
 
     func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) -> Promise<Output> {
-        parameters.onlyLogin.map { result -> Void in
+        parameters.onlyLogin.map { _ -> Void in
             guard parameters.input.name.count < 40 else {
                 throw UserError.incorrectName
             }

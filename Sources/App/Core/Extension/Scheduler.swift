@@ -3,12 +3,12 @@ import Foundation
 final class Scheduler {
 
     var isRunning: Bool {
-        return self.item != nil
+        self.item != nil
     }
     private let defaultDelay: TimeInterval
     private let needAutoRetain: Bool
 
-    private var autoRetain: Scheduler? = nil
+    private var autoRetain: Scheduler?
     private var item: DispatchWorkItem?
 
     init(defaultDelay: TimeInterval, needAutoRetain: Bool = false) {

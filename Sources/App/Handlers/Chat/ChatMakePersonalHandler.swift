@@ -3,24 +3,29 @@ import Foundation
 
 struct ChatMakePersonalHandler: IRequestHandler {
     var name: String {
-        return "chat/make_personal"
+        "chat/make_personal"
     }
 
     func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) -> Promise<Output> {
         parameters.getUser.then { me in
             dataBase.run(request: DBGetUserRequest(userId: parameters.input.userId)).only.map { (me: me, user: $0) }
         }.then { result in
-            ChatMakeHandler(isPersonal: true).handle(
-                .init(
-                    authorisationInfo: parameters.authorisationInfo,
-                    updateCenter: parameters.updateCenter,
-                    input: .init(
-                        name: "SYS ##\(["\(result.user.identifier)", "\(result.me.identifier)"].sorted(by: >).joined(separator: "-"))##"
+            firstly { () -> Promise<String> in
+                let identifiers = ["\(result.user.identifier)", "\(result.me.identifier)"].sorted(by: >)
+                return .value("SYS ##\(identifiers.joined(separator: "-"))##")
+            }.then { chatName in
+                ChatMakeHandler(isPersonal: true).handle(
+                    .init(
+                        authorisationInfo: parameters.authorisationInfo,
+                        updateCenter: parameters.updateCenter,
+                        input: .init(
+                            name: chatName
+                        ),
+                        time: parameters.time
                     ),
-                    time: parameters.time
-                ),
-                dataBase: dataBase
-            ).map { (user: result.user, chat: $0, me: result.me) }
+                    dataBase: dataBase
+                )
+            }.map { (user: result.user, chat: $0, me: result.me) }
         }
         .then { result in
             dataBase.run(
@@ -66,4 +71,3 @@ extension ChatMakePersonalHandler {
         let user: UsersOutput.User
     }
 }
-

@@ -58,14 +58,13 @@ extension UserLoginHandler {
         let securityHash: String
         let userPublicKey: String
     }
-    
+
     struct Output: Codable {
         let token: String
         let serverPublicKey: String
         let userId: IdentifierType
     }
 }
-
 
 extension UserError {
     static var loginError: UserError {

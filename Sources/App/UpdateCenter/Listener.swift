@@ -4,7 +4,7 @@ import Foundation
 final class Listener {
     let promise: Promise<[NotificationOutputContainer]>
 
-    var active: Bool = false {
+    var active = false {
         didSet {
             self.update()
         }
@@ -25,12 +25,12 @@ final class Listener {
             pending.resolver.fulfill(self.containers)
         }
     }
-    
+
     func append(_ container: NotificationOutputContainer) {
         self.containers.append(container)
         self.update()
     }
-    
+
     private func update() {
         guard self.active else { return }
         if containers.count > 20 {
@@ -41,7 +41,6 @@ final class Listener {
     }
 }
 
-
 final class UpdateTask {
     let resault: Promise<Void>
 
@@ -49,7 +48,7 @@ final class UpdateTask {
     private let cancelResolver: Resolver<Void>
 
     private let scheduler = Scheduler(defaultDelay: 0.5)
-    
+
     init(_ maxTime: Double = 30) {
         let updatePending = Promise<Void>.pending()
         let cancelPending = Promise<Void>.pending()
@@ -58,13 +57,13 @@ final class UpdateTask {
         let max: Promise<Void>  = after(seconds: maxTime).asVoid()
         self.resault = race([max, updatePending.promise, cancelPending.promise])
     }
-    
+
     func update() {
         scheduler.schedule { [weak self] in
             self?.updateResolver.fulfill(())
         }
     }
-    
+
     func cancel() {
         self.cancelResolver.fulfill(())
     }

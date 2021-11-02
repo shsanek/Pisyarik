@@ -2,7 +2,7 @@ struct UserError: Codable {
     let name: String
     let description: String
     let info: String?
-    let code: String = "unknownError"
+    var code: String = "unknownError"
 }
 
 extension UserError {
@@ -31,7 +31,7 @@ extension UserError {
     }
 }
 
-extension UserError: Error, UserErrorHandable{
+extension UserError: Error, UserErrorHandable {
     func generateError() -> UserError {
         return self
     }
@@ -57,24 +57,24 @@ extension Error {
 
 extension UserError {
     static var alreadyLogin: UserError {
-        return UserError(name: "User already login", description: "User already login", info: nil)
+        UserError(name: "User already login", description: "User already login", info: nil)
     }
-    
+
     static var incorrectToken: UserError {
-        return UserError(name: "Incorrect token", description: "Incorrect token", info: nil)
+        UserError(name: "Incorrect token", description: "Incorrect token", info: nil)
     }
-    
+
     static var accessError: UserError {
-        return UserError(name: "Access error", description: "Access error", info: nil)
+        UserError(name: "Access error", description: "Access error", info: nil)
     }
 }
 
 extension UserError {
     static var incorrectName: UserError {
-        return UserError(name: "Incorrect name", description: "<40", info: nil)
+        UserError(name: "Incorrect name", description: "<40", info: nil)
     }
-    
+
     static var nameAlreadyRegistry: UserError {
-        return UserError(name: "Name already registry", description: "<40", info: nil)
+        UserError(name: "Name already registry", description: "<40", info: nil)
     }
 }

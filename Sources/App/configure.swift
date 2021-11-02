@@ -3,7 +3,7 @@ import PromiseKit
 
 // configures your application
 public func configure(_ app: Application) throws {
-    let workQ = DispatchQueue(label: "workq",attributes: .concurrent)
+    let workQ = DispatchQueue(label: "workq", attributes: .concurrent)
     conf.Q = (map: workQ, return: workQ)
 
     let dataBase = DataBase()
@@ -11,11 +11,11 @@ public func configure(_ app: Application) throws {
 
     let rootRouter = RootRouter(dataBase: dataBase, app: app)
     rootRouter.registration(handler: CheckHandler())
-    
+
     rootRouter.registration(handler: UserLoginHandler())
     rootRouter.registration(handler: UserRegistrationHandler())
     rootRouter.registration(handler: UserSearchHandler())
-    
+
     rootRouter.registration(handler: MessageGetFromChat())
     rootRouter.registration(handler: MessageSendHandler())
     rootRouter.registration(handler: MessageSetReadMark())
@@ -25,20 +25,19 @@ public func configure(_ app: Application) throws {
     rootRouter.registration(handler: ChatGetUsersHandler())
     rootRouter.registration(handler: ChatGetAllMyHandler())
     rootRouter.registration(handler: ChatMakePersonalHandler())
-    
+
     rootRouter.registration(handler: UpdateGetHandler())
 
-
-    app.get("**".pathComponents) { request in
+    app.get("**".pathComponents) { _ in
         return UserError.notFoundError
     }
-    app.post("**".pathComponents) { request in
+    app.post("**".pathComponents) { _ in
         return UserError.notFoundError
     }
-    app.post { request in
+    app.post { _ in
         return UserError.notFoundError
     }
-    app.get { request in
+    app.get { _ in
         return UserError.notFoundError
     }
 }

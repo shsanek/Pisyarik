@@ -7,6 +7,6 @@ struct DBUpdateVersionRequest: IDBRequest {
     var request: String {
         "UPDATE version SET version = \(version) WHERE identifier = 0;"
     }
-    
+
     let version: Int
 }

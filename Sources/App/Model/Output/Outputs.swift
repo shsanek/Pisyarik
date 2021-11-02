@@ -4,12 +4,12 @@ struct UsersOutput: Codable {
         let userId: IdentifierType
         let isSelf: Bool
     }
-    
+
     let users: [User]
 }
 
 extension UsersOutput {
-    init(_ users: [DBContainer<DBUserRaw>], authorisationInfo: AuthorisationInfo?){
+    init(_ users: [DBContainer<DBUserRaw>], authorisationInfo: AuthorisationInfo?) {
         self = UsersOutput(
             users: users.map {
                 UsersOutput.User(
@@ -31,12 +31,12 @@ struct ChatsOutput: Codable {
         let lastMessageId: IdentifierType?
         let notReadCount: Int?
     }
-    
+
     let chats: [Chat]
 }
 
 extension ChatsOutput.Chat {
-    init(_ raw: DBContainer2<DBChatRaw, DBFullMessageRaw>, authorisationInfo: AuthorisationInfo?){
+    init(_ raw: DBContainer2<DBChatRaw, DBFullMessageRaw>, authorisationInfo: AuthorisationInfo?) {
         self = ChatsOutput.Chat(
             name: raw.content1.name,
             chatId: raw.identifier,
@@ -49,7 +49,7 @@ extension ChatsOutput.Chat {
 }
 
 extension ChatsOutput {
-    init(_ chats: [DBContainer2<DBChatRaw, DBFullMessageRaw>], authorisationInfo: AuthorisationInfo?){
+    init(_ chats: [DBContainer2<DBChatRaw, DBFullMessageRaw>], authorisationInfo: AuthorisationInfo?) {
         self = ChatsOutput(
             chats: chats.map {
                 ChatsOutput.Chat($0, authorisationInfo: authorisationInfo)
@@ -67,6 +67,7 @@ struct MessagesOutput: Codable {
         let messageId: IdentifierType
         let chatId: IdentifierType
     }
+
     let messages: [Message]
 }
 

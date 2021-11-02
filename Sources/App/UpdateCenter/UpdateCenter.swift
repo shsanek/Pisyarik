@@ -2,22 +2,21 @@ import PromiseKit
 
 final class UpdateCenter {
     private let dataBase: IDataBase
-    private let lock: Lock = Lock()
-    private var listeners = [IdentifierType: Listener]()
-    
+    private let lock = Lock()
+    private var listeners: [IdentifierType: Listener] = [:]
 
     init(dataBase: IDataBase) {
         self.dataBase = dataBase
     }
-    
+
     func addListener(id: IdentifierType) -> Promise<[NotificationOutputContainer]> {
         lock.lockWriting()
         defer {
             lock.unlock()
         }
-        var listener = listeners[id] ?? create(id: id)
+        var listener = listeners[id] ?? make(id: id)
         if listener.active {
-            listener = create(id: id)
+            listener = make(id: id)
         }
         listener.active = true
         return listener.promise
@@ -25,19 +24,19 @@ final class UpdateCenter {
 
     func update(action: UpdateAction) {
         switch action {
-        case .newMessage(let message):
+        case let .newMessage(message):
             self.newMessage(message)
-        case .addInNewChat(let chat, let userId):
+        case let .addInNewChat(chat, userId):
             self.addInNewChat(chat, userId: userId)
-        case .newPersonalChat(let chat, let userId):
+        case let .newPersonalChat(chat, userId):
             self.newPersonalChat(chat, userId: userId)
         }
     }
-    
-    private func create(id: IdentifierType) -> Listener {
-        let listener = Listener() { [weak self] active in
+
+    private func make(id: IdentifierType) -> Listener {
+        let listener = Listener { [weak self] active in
             if active {
-                _ = self?.create(id: id)
+                _ = self?.make(id: id)
             }
         }
         listeners[id] = listener
@@ -52,14 +51,19 @@ private extension UpdateCenter {
             defer {
                 self.lock.unlock()
             }
-            for user in result {
-                if user.identifier != message.user.userId {
-                    self.listeners[user.identifier]?.append(.init(NotificationOutput(type: .newMessage, content: message)))
-                }
+            for user in result where user.identifier != message.user.userId {
+                self.listeners[user.identifier]?.append(
+                    .init(
+                        NotificationOutput(
+                            type: .newMessage,
+                            content: message
+                        )
+                    )
+                )
             }
         }.catch { _ in }
     }
-    
+
     func newPersonalChat(_ output: ChatMakePersonalHandler.Output, userId: IdentifierType) {
         self.listeners[userId]?.append(.init(NotificationOutput(type: .newPersonalChat, content: output)))
 

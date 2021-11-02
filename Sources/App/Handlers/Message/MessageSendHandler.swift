@@ -5,7 +5,7 @@ struct MessageSendHandler: IRequestHandler {
     var name: String {
         "message/send"
     }
-    
+
     func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) -> Promise<Output> {
         let time = UInt(Date.timeIntervalSinceReferenceDate)
         return parameters.getUser.then { info in

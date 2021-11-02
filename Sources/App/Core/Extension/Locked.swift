@@ -72,6 +72,3 @@ public class Locked<Value> {
         mutation(&value)
     }
 }
-
-
-

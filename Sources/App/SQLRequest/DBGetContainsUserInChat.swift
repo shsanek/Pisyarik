@@ -8,6 +8,9 @@ struct DBGetContainsUserInChat: IDBRequest {
 extension DBGetContainsUserInChat {
     init(userId: IdentifierType, chatId: IdentifierType) {
         self.description = "Get contains user in chat"
-        self.request = "SELECT COUNT(*) as count FROM chat_user WHERE user_id = \(userId) AND chat_id = \(chatId);"
+        self.request = """
+            SELECT COUNT(*) as count FROM chat_user
+            WHERE user_id = \(userId) AND chat_id = \(chatId);
+            """
     }
 }

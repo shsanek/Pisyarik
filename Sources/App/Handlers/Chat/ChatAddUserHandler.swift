@@ -3,9 +3,9 @@ import Foundation
 
 struct ChatAddUserHandler: IRequestHandler {
     var name: String {
-        return "chat/add_user"
+        "chat/add_user"
     }
-    
+
     func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) -> Promise<EmptyRaw> {
         parameters.getUser.then { info in
             dataBase.run(
@@ -32,7 +32,9 @@ struct ChatAddUserHandler: IRequestHandler {
             }
             return Void()
         }.then { _ in
-            dataBase.run(request: DBGetChatRequest(chatId: parameters.input.chatId)).only.map { result -> ChatsOutput.Chat in
+            firstly {
+                dataBase.run(request: DBGetChatRequest(chatId: parameters.input.chatId))
+            }.only.map { result -> ChatsOutput.Chat in
                 if result.content1.is_personal != 0 {
                     throw UserError.personalChat
                 }
@@ -64,7 +66,7 @@ extension UserError {
     static var alreadyInChat: UserError {
         UserError(name: "Already in chat", description: "User already added in chat", info: nil)
     }
-    
+
     static var personalChat: UserError {
         UserError(name: "This is personal chat", description: "This is personal chat", info: nil)
     }

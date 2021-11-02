@@ -30,7 +30,7 @@ extension DBGetChatRequest {
                 user.identifier = message.user_id;
             """
     }
-    
+
     init(name: String) {
         self.description = "Get chats with name = '\(name)'"
         self.request = "SELECT * FROM chat WHERE name = '\(name)';"
@@ -40,12 +40,12 @@ extension DBGetChatRequest {
         self.description = "Get chats with name contains '\(name)'"
         self.request = "SELECT * FROM chat WHERE name LIKE BINARY '%\(name)%';"
     }
-    
+
     init(chatId: IdentifierType) {
         self.description = "Get chats with id '\(chatId)'"
         self.request = "SELECT * FROM chat WHERE identifier = \(chatId);"
     }
-    
+
     init(chatId: IdentifierType, userId: IdentifierType) {
         self.description = "Get chats with id '\(chatId)' for user \(userId)"
         self.request = """

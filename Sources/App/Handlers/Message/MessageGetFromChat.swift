@@ -1,7 +1,7 @@
 import PromiseKit
 import Foundation
 
-struct MessageGetFromChat: IRequestHandler  {
+struct MessageGetFromChat: IRequestHandler {
     var name: String {
         "message/get_from_chat"
     }

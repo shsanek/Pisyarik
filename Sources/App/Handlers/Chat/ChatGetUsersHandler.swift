@@ -32,4 +32,3 @@ extension ChatGetUsersHandler {
         let chatId: IdentifierType
     }
 }
-

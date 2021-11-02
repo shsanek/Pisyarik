@@ -1,6 +1,6 @@
 import PromiseKit
 
-struct CheckHandler: IRequestHandler {    
+struct CheckHandler: IRequestHandler {
     var name: String {
         "check"
     }
@@ -12,7 +12,7 @@ struct CheckHandler: IRequestHandler {
     }
 }
 
-extension CheckHandler{
+extension CheckHandler {
     struct Output: Encodable {
         let version = "1"
         let dbVersion: Int?
