@@ -12,17 +12,21 @@ struct ChatMakeHandler: IRequestHandler {
         self.isPersonal = isPersonal
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) -> Promise<Output> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<Output> {
         parameters.onlyLogin.map { _ -> Void in
             guard parameters.input.name.count < 40 else {
-                throw UserError.incorrectName
+                throw Errors.incorrectName.description(
+                    "Проверь правильность имени пока ограничения такие (< 40)"
+                )
             }
             return Void()
         }.then { _ in
             dataBase.run(request: DBGetChatRequest(name: parameters.input.name))
         }.map { result -> Void in
             guard result.count == 0 else {
-                throw UserError.nameAlreadyRegistry
+                throw Errors.nameAlreadyRegistry.description(
+                    "Такое имя чата уже существует (ну пока вот так)"
+                )
             }
             return Void()
         }.then { _ in

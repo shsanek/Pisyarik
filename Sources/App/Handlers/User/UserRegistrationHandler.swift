@@ -5,21 +5,26 @@ struct UserRegistrationHandler: IRequestHandler {
         "user/registration"
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) -> Promise<Output> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<Output> {
         guard parameters.authorisationInfo == nil else {
-            return .init(error: UserError.alreadyLogin)
+            throw Errors.alreadyLogin.description(
+                "Пользователь уже авторизирован почисти авторизационные токены"
+            )
         }
         guard parameters.input.name.count < 40 else {
-            return .init(error: UserError.incorrectName)
+            throw Errors.incorrectName.description(
+                "Неправильное имя проверь ограничения сейчас < 40"
+            )
         }
-        guard
-            let key = try? CryptoUtils.generateKey(userPublicKey: parameters.input.userPublicKey)
-        else {
-            return .init(error: UserError.loginError)
+        let key = try Errors.internalError.handle(
+            "Неудаеться сгенерить семетричный ключ"
+        ) {
+            try CryptoUtils.generateKey(userPublicKey: parameters.input.userPublicKey)
         }
+
         return dataBase.run(request: DBGetUserRequest(name: parameters.input.name)).handler { result in
             if result.count != 0 {
-                throw UserError.nameAlreadyRegistry
+                throw Errors.alreadyLogin.description("Пользователь с таким именем уже существует")
             }
         }.then { _ in
             dataBase.run(

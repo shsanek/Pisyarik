@@ -35,9 +35,15 @@
     },
     "errors": [//если пошло по пизде
         {
-            "name": String,
-            "description": String,
-            "info": String?
+            "code": String, // завязываться можно только на code остальное отрезается в prod
+            "developerInfo": ? {
+                "description": String // как я описал ошибку
+                "error": String? // полная распечатка (если такая есть)
+                "position": ? { // позиция в коде где произошло (если емеет смысл)
+                    "file": String
+                    "line": Int
+                }
+            }
         }
     ]
 }

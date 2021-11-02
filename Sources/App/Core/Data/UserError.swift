@@ -1,80 +1,49 @@
+import Foundation
+
 struct UserError: Codable {
-    let name: String
+    var code: String
+    let developerInfo: ErrorDeveloperInfo?
+}
+
+struct ErrorDeveloperInfo: Codable {
+    init(
+        description: String,
+        error: String?,
+        position: ErrorDeveloperInfo.Position?
+    ) {
+        self.description = description
+        self.error = error
+        self.position = position.flatMap({ position in
+            Position(
+                file: position.file.components(separatedBy: "/").last ?? "",
+                line: position.line
+            )
+        })
+    }
+    
     let description: String
-    let info: String?
-    var code: String = "unknownError"
-}
+    let error: String?
+    let position: Position?
 
-extension UserError {
-    static var defaultError: String {
-        """
-        {
-            "status": "error",
-            "errors": [{
-                "name": "unknown error",
-                "description": "unexpected behavior"
-            }]
-        }
-        """
-    }
-
-    static var notFoundError: String {
-        """
-        {
-            "status": "error",
-            "errors": [{
-                "name": "Method not found",
-                "description": "Method not found"
-            }]
-        }
-        """
+    struct Position: Codable {
+        let file: String
+        let line: Int
     }
 }
 
-extension UserError: Error, UserErrorHandable {
-    func generateError() -> UserError {
-        return self
-    }
-}
+enum Errors: String {
+    case unknown
+    case methodNotFound
 
-extension UserError {
-    init(_ error: Error) {
-        self.name = "unknown error"
-        self.info = "\(error)"
-        self.description = error.localizedDescription
-    }
-}
+    case alreadyLogin
+    case incorrectToken
+    case accessError
 
-protocol UserErrorHandable {
-    func generateError() -> UserError
-}
+    case incorrectName
+    case nameAlreadyRegistry
 
-extension Error {
-    func makeUserError() -> UserError {
-        (self as? UserErrorHandable)?.generateError() ?? UserError(self)
-    }
-}
+    case userAlreadyInChat
+    case loginErrors
 
-extension UserError {
-    static var alreadyLogin: UserError {
-        UserError(name: "User already login", description: "User already login", info: nil)
-    }
-
-    static var incorrectToken: UserError {
-        UserError(name: "Incorrect token", description: "Incorrect token", info: nil)
-    }
-
-    static var accessError: UserError {
-        UserError(name: "Access error", description: "Access error", info: nil)
-    }
-}
-
-extension UserError {
-    static var incorrectName: UserError {
-        UserError(name: "Incorrect name", description: "<40", info: nil)
-    }
-
-    static var nameAlreadyRegistry: UserError {
-        UserError(name: "Name already registry", description: "<40", info: nil)
-    }
+    case internalError
 }

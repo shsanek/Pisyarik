@@ -6,7 +6,7 @@ struct MessageSendHandler: IRequestHandler {
         "message/send"
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) -> Promise<Output> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<Output> {
         let time = UInt(Date.timeIntervalSinceReferenceDate)
         return parameters.getUser.then { info in
             dataBase.run(
@@ -17,7 +17,9 @@ struct MessageSendHandler: IRequestHandler {
             )
         }.map { result -> Void in
             if result.first?.count ?? 0 == 0 {
-                throw UserError.accessError
+                throw Errors.accessError.description(
+                    "Пользователя нет в этом чате"
+                )
             }
             return Void()
         }.then { _ in

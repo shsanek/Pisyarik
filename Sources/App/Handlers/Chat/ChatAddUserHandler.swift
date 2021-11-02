@@ -6,7 +6,7 @@ struct ChatAddUserHandler: IRequestHandler {
         "chat/add_user"
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) -> Promise<EmptyRaw> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<EmptyRaw> {
         parameters.getUser.then { info in
             dataBase.run(
                 request: DBGetContainsUserInChat(
@@ -16,7 +16,9 @@ struct ChatAddUserHandler: IRequestHandler {
             )
         }.map { result -> Void in
             if result.first?.count ?? 0 == 0 {
-                throw UserError.accessError
+                throw Errors.accessError.description(
+                    "Пользователя нет в этом чате"
+                )
             }
             return Void()
         }.then { _ in
@@ -28,7 +30,9 @@ struct ChatAddUserHandler: IRequestHandler {
             )
         }.map { result -> Void in
             if result.first?.count ?? 0 > 0 {
-                throw UserError.alreadyInChat
+                throw Errors.userAlreadyInChat.description(
+                    "Пользователь уже состоит в данном чате"
+                )
             }
             return Void()
         }.then { _ in
@@ -36,7 +40,9 @@ struct ChatAddUserHandler: IRequestHandler {
                 dataBase.run(request: DBGetChatRequest(chatId: parameters.input.chatId))
             }.only.map { result -> ChatsOutput.Chat in
                 if result.content1.is_personal != 0 {
-                    throw UserError.personalChat
+                    throw Errors.accessError.description(
+                        "Добавление в персональные чаты недоступно"
+                    )
                 }
                 return .init(result, authorisationInfo: parameters.authorisationInfo)
             }
@@ -59,15 +65,5 @@ extension ChatAddUserHandler {
     struct Input: Codable {
         let chatId: IdentifierType
         let userId: IdentifierType
-    }
-}
-
-extension UserError {
-    static var alreadyInChat: UserError {
-        UserError(name: "Already in chat", description: "User already added in chat", info: nil)
-    }
-
-    static var personalChat: UserError {
-        UserError(name: "This is personal chat", description: "This is personal chat", info: nil)
     }
 }

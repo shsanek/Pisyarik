@@ -6,10 +6,12 @@ struct MessageGetFromChat: IRequestHandler {
         "message/get_from_chat"
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) -> Promise<MessagesOutput> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<MessagesOutput> {
         Promise.value(parameters).map { _ -> Void in
             if parameters.input.limit > 100 {
-                throw NSError(domain: "max limit 100", code: 2, userInfo: nil)
+                throw Errors.internalError.description(
+                    "Превышен лимит в 100"
+                )
             }
             return Void()
         }
@@ -23,7 +25,9 @@ struct MessageGetFromChat: IRequestHandler {
             )
         }.map { result -> Void in
             if result.first?.count ?? 0 == 0 {
-                throw UserError.accessError
+                throw Errors.accessError.description(
+                    "Пользователя нет в этом чате"
+                )
             }
             return Void()
         }.then { _ in

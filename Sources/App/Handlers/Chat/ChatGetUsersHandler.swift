@@ -6,7 +6,7 @@ struct ChatGetUsersHandler: IRequestHandler {
         "chat/get_users"
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) -> Promise<UsersOutput> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<UsersOutput> {
         parameters.getUser.then { info in
             dataBase.run(
                 request: DBGetContainsUserInChat(
@@ -16,7 +16,9 @@ struct ChatGetUsersHandler: IRequestHandler {
             )
         }.map({ result -> Void in
             if result.first?.count ?? 0 == 0 {
-                throw UserError.accessError
+                throw Errors.accessError.description(
+                    "Пользователя нет в этом чате"
+                )
             }
             return Void()
         }).then { _ in

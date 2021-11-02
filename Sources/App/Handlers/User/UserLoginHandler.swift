@@ -6,22 +6,23 @@ struct UserLoginHandler: IRequestHandler {
         "user/login"
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) -> Promise<Output> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<Output> {
         guard parameters.authorisationInfo == nil else {
-            return .init(error: UserError.alreadyLogin)
+            throw Errors.alreadyLogin.description(
+                "Пользователь уже авторизирован почисти авторизационные токены"
+            )
         }
         let result = Promise<Output>.pending()
-        guard
-            let key = try? CryptoUtils.generateKey(userPublicKey: parameters.input.userPublicKey)
-        else {
-            return .init(error: UserError.loginError)
+
+        let key = try Errors.loginErrors.handle("Неудаеться сгенерить семетричный ключ") {
+            try CryptoUtils.generateKey(userPublicKey: parameters.input.userPublicKey)
         }
         dataBase
             .run(request: DBGetUserRequest(name: parameters.input.name))
             .firstValue
             .handler { user in
                 guard user.content.security_hash == String(parameters.input.securityHash.prefix(64)) else {
-                    throw UserError.loginError
+                    throw Errors.loginErrors.description("Неправильный security_hash")
                 }
             }
             .then { user in
@@ -45,8 +46,9 @@ struct UserLoginHandler: IRequestHandler {
             }.done { output in
                 result.resolver.fulfill(output)
             }.catch { error in
-                print(error)
-                result.resolver.reject(UserError.loginError)
+                var error = UserError(error)
+                error.code = Errors.loginErrors.rawValue
+                result.resolver.reject(error)
             }
         return result.promise
     }
@@ -63,11 +65,5 @@ extension UserLoginHandler {
         let token: String
         let serverPublicKey: String
         let userId: IdentifierType
-    }
-}
-
-extension UserError {
-    static var loginError: UserError {
-        UserError(name: "Login error", description: "Login error", info: nil)
     }
 }

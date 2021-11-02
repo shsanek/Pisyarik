@@ -6,7 +6,7 @@ struct ChatMakePersonalHandler: IRequestHandler {
         "chat/make_personal"
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) -> Promise<Output> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<Output> {
         parameters.getUser.then { me in
             dataBase.run(request: DBGetUserRequest(userId: parameters.input.userId)).only.map { (me: me, user: $0) }
         }.then { result in
@@ -14,7 +14,7 @@ struct ChatMakePersonalHandler: IRequestHandler {
                 let identifiers = ["\(result.user.identifier)", "\(result.me.identifier)"].sorted(by: >)
                 return .value("SYS ##\(identifiers.joined(separator: "-"))##")
             }.then { chatName in
-                ChatMakeHandler(isPersonal: true).handle(
+                try ChatMakeHandler(isPersonal: true).handle(
                     .init(
                         authorisationInfo: parameters.authorisationInfo,
                         updateCenter: parameters.updateCenter,

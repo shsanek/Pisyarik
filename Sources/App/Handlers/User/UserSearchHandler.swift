@@ -5,7 +5,7 @@ struct UserSearchHandler: IRequestHandler {
         "user/search"
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) -> Promise<UsersOutput> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<UsersOutput> {
         parameters.onlyLogin.then { parameters in
             dataBase.run(request: DBGetUserRequest(contains: parameters.input.name))
         }.map { result in

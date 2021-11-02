@@ -108,32 +108,3 @@ extension EventLoopPromise where Value == String {
         }
     }
 }
-
-extension RequestParameters {
-    var onlyLogin: Promise<Self> {
-        Promise.value(self).map { result in
-            if result.authorisationInfo == nil {
-                throw UserError(
-                    name: "available only for authorized users",
-                    description: "available only for authorized users",
-                    info: nil
-                )
-            }
-            return result
-        }
-    }
-
-    var getUser: Promise<AuthorisationInfo> {
-        Promise { resolver in
-            guard let info = self.authorisationInfo else {
-                resolver.reject(UserError(
-                    name: "available only for authorized users",
-                    description: "available only for authorized users",
-                    info: nil
-                ))
-                return
-            }
-            resolver.fulfill(info)
-        }
-    }
-}

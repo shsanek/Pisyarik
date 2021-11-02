@@ -6,7 +6,7 @@ protocol IRequestHandler {
 
     var name: String { get }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) -> Result
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Result
 }
 
 extension IRequestHandler {

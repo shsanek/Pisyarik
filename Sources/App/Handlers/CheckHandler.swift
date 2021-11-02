@@ -5,7 +5,7 @@ struct CheckHandler: IRequestHandler {
         "check"
     }
 
-    func handle(_ parameters: RequestParameters<EmptyRaw>, dataBase: IDataBase) -> Promise<Output> {
+    func handle(_ parameters: RequestParameters<EmptyRaw>, dataBase: IDataBase) throws -> Promise<Output> {
         dataBase.run(request: DBGetVersionRequest()).firstValue.map { result in
             Output(dbVersion: result.version)
         }

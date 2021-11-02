@@ -48,21 +48,21 @@ final class DataBase {
         let result = Promise<[Result]>.pending()
         do {
             guard let url = URL(string: address) else {
-                throw NSError(
-                    domain: "SQL error",
-                    code: 2,
-                    userInfo: ["request description": description]
-                )
+                throw Errors.internalError.description("СМЕРТЬ не удалось сгенерить URL для bd")
             }
             let raw = SQLRequestResultRaw(
                 request: request
             )
             var urlRequest = URLRequest(url: url)
-            let data = try JSONEncoder().encode(raw)
+            let data = try Errors.internalError.handle("не удалось сформировать запрос к bd", {
+                try JSONEncoder().encode(raw)
+            })
             urlRequest.httpBody = data
             urlRequest.httpMethod = "POST"
             return session.dataPromise(with: urlRequest).map { data in
-                try JSONDecoder().decode(SQLResponseRaw<Result>.self, from: data)
+                try Errors.internalError.handle("не удалось распарсить ответ от bd") {
+                    try JSONDecoder().decode(SQLResponseRaw<Result>.self, from: data)
+                }
             }.map { (result: SQLResponseRaw<Result>) -> [Result] in
                 if let content = result.content {
                     return content
@@ -81,6 +81,7 @@ final class DataBase {
                 )
             }
         } catch {
+            let error = UserError(error)
             result.resolver.reject(error)
         }
         return result.promise

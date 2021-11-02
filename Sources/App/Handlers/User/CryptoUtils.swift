@@ -6,13 +6,19 @@ enum CryptoUtils {
         let uuid = UUID().uuidString
         if #available(macOS 11.0, *) {
             guard let salt = uuid.data(using: .utf8) else {
-                throw UserError.loginError
+                throw Errors.internalError.description(
+                    "Не удалось преобразовать салат(token) в дату проверь utf8"
+                )
             }
             let serverPrivateKey = P521.KeyAgreement.PrivateKey()
-            let userPublicKey = try P521.KeyAgreement.PublicKey(
-                pemRepresentation: userPublicKey
-            )
-            let serverSharedSecret = try serverPrivateKey.sharedSecretFromKeyAgreement(with: userPublicKey)
+            let userPublicKey = try Errors.internalError.handle("Ошибка криптографии") {
+                try P521.KeyAgreement.PublicKey(
+                    pemRepresentation: userPublicKey
+                )
+            }
+            let serverSharedSecret = try Errors.internalError.handle("Ошибка криптографии") {
+                try serverPrivateKey.sharedSecretFromKeyAgreement(with: userPublicKey)
+            }
             let secretSymmetricKey = serverSharedSecret.hkdfDerivedSymmetricKey(
                 using: SHA256.self,
                 salt: salt,
@@ -23,7 +29,9 @@ enum CryptoUtils {
                 return Data(Array($0)).base64EncodedString().cleanHash
             }
             guard let symmetricKey = symmetricKey else {
-                throw UserError.loginError
+                throw Errors.loginErrors.description(
+                    "Не удалось собрать семетричный ключ для токена"
+                )
             }
             return (
                 uuid: uuid,
