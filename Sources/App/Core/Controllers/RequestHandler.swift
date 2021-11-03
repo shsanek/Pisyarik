@@ -15,6 +15,7 @@ extension IRequestHandler {
 
 struct AuthorisationInfo {
     let identifier: IdentifierType
+    let token: String
     let user: DBUserRaw
 }
 

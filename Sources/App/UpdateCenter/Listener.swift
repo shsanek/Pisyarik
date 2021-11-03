@@ -2,7 +2,8 @@ import PromiseKit
 import Foundation
 
 final class Listener {
-    let promise: Promise<[NotificationOutputContainer]>
+    lazy var lazy = LazyRequest { [promise] in promise  }
+    private let promise: Promise<[NotificationOutputContainer]>
 
     var active = false {
         didSet {

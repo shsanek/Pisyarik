@@ -6,7 +6,7 @@ struct MessageSendHandler: IRequestHandler {
         "message/send"
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<Output> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<MessageOutput> {
         let time = UInt(Date.timeIntervalSinceReferenceDate)
         return parameters.getUser.then { info in
             dataBase.run(
@@ -49,8 +49,13 @@ struct MessageSendHandler: IRequestHandler {
                     )
                 )
             }
-        }.map { result in
-            Output(messageId: result.identifier)
+        }.then { result in
+            dataBase.run(request: DBGetMessage(messageId: result.identifier))
+        }.only.map { raw in
+            MessageOutput(
+                raw,
+                authorisationInfo: parameters.authorisationInfo
+            )
         }
     }
 }
@@ -60,8 +65,5 @@ extension MessageSendHandler {
         let chatId: IdentifierType
         let type: String
         let content: String
-    }
-    struct Output: Codable {
-        let messageId: IdentifierType
     }
 }

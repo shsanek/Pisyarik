@@ -24,4 +24,16 @@ extension DBGetMessage {
             ORDER BY message_id \(sort)
             """
     }
+    
+    init(messageId: IdentifierType) {
+        self.description = "Get message"
+        self.request = """
+            SELECT
+                \(DBUserRaw.sqlGET()),
+                \(DBMessageRaw.sqlGET)
+            FROM message, user
+            WHERE message.user_id = user.identifier AND message.identifier = \(messageId)
+            ;
+            """
+    }
 }

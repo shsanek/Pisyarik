@@ -2,6 +2,24 @@
   "object": {
     "pins": [
       {
+        "package": "apns",
+        "repositoryURL": "https://github.com/vapor/apns.git",
+        "state": {
+          "branch": null,
+          "revision": "de66060fcada6d9fef4f0cae03375eee2a166b5c",
+          "version": "2.2.0"
+        }
+      },
+      {
+        "package": "apnswift",
+        "repositoryURL": "https://github.com/kylebrowning/APNSwift.git",
+        "state": {
+          "branch": null,
+          "revision": "b53fd38f5611c6b935427febb43d91b15be26c0d",
+          "version": "3.2.0"
+        }
+      },
+      {
         "package": "async-http-client",
         "repositoryURL": "https://github.com/swift-server/async-http-client.git",
         "state": {
@@ -26,6 +44,15 @@
           "branch": null,
           "revision": "75ea3b627d88221440b878e5dfccc73fd06842ed",
           "version": "4.2.7"
+        }
+      },
+      {
+        "package": "jwt-kit",
+        "repositoryURL": "https://github.com/vapor/jwt-kit.git",
+        "state": {
+          "branch": null,
+          "revision": "1822bb0abf0a31a4b5078ec19061c548835253b5",
+          "version": "4.3.0"
         }
       },
       {

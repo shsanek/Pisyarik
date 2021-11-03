@@ -121,6 +121,35 @@ res:
 }
 ```
 
+### user/logout
+
+Logout пользователя
+
+``` json
+    Input {
+    }
+```
+
+``` json
+    Output {
+    }
+```
+
+### user/set_apns_token
+
+Устанавливает apns токен
+
+``` json
+    Input {
+        token: String
+    }
+```
+
+``` json
+    Output {
+    }
+```
+
 ### user/registration
 
 Регистрирует пользователя, сразу логинет пользователя
@@ -242,7 +271,7 @@ res:
 ```
 
 ###### example:
-нетестировалось
+
 
 ### user/update_self
 
@@ -264,7 +293,6 @@ res:
 ```
 
 ###### example:
-нетестировалось
 
 ## chat
 

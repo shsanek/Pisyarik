@@ -39,7 +39,8 @@ struct UserRegistrationHandler: IRequestHandler {
                     token: DBTokenRaw(
                         token_token: key.uuid,
                         token_secret_key: String(key.symmetricKey),
-                        token_user_id: identifier.identifier
+                        token_user_id: identifier.identifier,
+                        token_apns_token: nil
                     )
                 )
             ).map { _ in

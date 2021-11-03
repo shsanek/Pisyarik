@@ -1,12 +1,16 @@
 import PromiseKit
+import Vapor
+import APNS
 
 final class UpdateCenter {
     private let dataBase: IDataBase
     private let lock = Lock()
     private var listeners: [IdentifierType: Listener] = [:]
+    private let app: Application
 
-    init(dataBase: IDataBase) {
+    init(dataBase: IDataBase, app: Application) {
         self.dataBase = dataBase
+        self.app = app
     }
 
     func addListener(id: IdentifierType) -> Promise<[NotificationOutputContainer]> {
@@ -14,15 +18,16 @@ final class UpdateCenter {
         defer {
             lock.unlock()
         }
-        var listener = listeners[id] ?? make(id: id)
-        if listener.active {
-            listener = make(id: id)
-        }
+        let listener = listeners[id] ?? make(id: id)
         listener.active = true
-        return listener.promise
+        return listener.lazy.promise()
     }
 
     func update(action: UpdateAction) {
+        self.lock.lockReading()
+        defer {
+            self.lock.unlock()
+        }
         switch action {
         case let .newMessage(message):
             self.newMessage(message)
@@ -35,8 +40,17 @@ final class UpdateCenter {
 
     private func make(id: IdentifierType) -> Listener {
         let listener = Listener { [weak self] active in
+            guard let self = self else {
+                return
+            }
+            self.lock.lockWriting()
+            defer {
+                self.lock.unlock()
+            }
             if active {
-                _ = self?.make(id: id)
+                _ = self.make(id: id)
+            } else {
+                self.listeners[id] = nil
             }
         }
         listeners[id] = listener
@@ -51,25 +65,57 @@ private extension UpdateCenter {
             defer {
                 self.lock.unlock()
             }
+            var pushUsers = [IdentifierType]()
             for user in result where user.user_id != message.user.userId {
-                self.listeners[user.user_id]?.append(
-                    .init(
-                        NotificationOutput(
-                            type: .newMessage,
-                            content: message
+                if let listener = self.listeners[user.user_id] {
+                    listener.append(
+                        .init(
+                            NotificationOutput(
+                                type: .newMessage,
+                                content: message
+                            )
                         )
                     )
-                )
+                } else {
+                    pushUsers.append(user.user_id)
+                }
             }
+            self.send(userIds: pushUsers, title: "\(message.user.name)", text: "\(message.content.prefix(100))")
         }.catch { _ in }
     }
 
     func newPersonalChat(_ output: ChatMakePersonalHandler.Output, userId: IdentifierType) {
-        self.listeners[userId]?.append(.init(NotificationOutput(type: .newPersonalChat, content: output)))
-
+        if let listener = self.listeners[userId] {
+            listener.append(.init(NotificationOutput(type: .newPersonalChat, content: output)))
+        } else {
+            self.send(userIds: [userId], title: "\(output.user.name)", text: "Начал диалог")
+        }
     }
 
     func addInNewChat(_ chat: ChatOutput, userId: IdentifierType) {
-        self.listeners[userId]?.append(.init(NotificationOutput(type: .addedInNewChat, content: chat)))
+        if let listener = self.listeners[userId] {
+            listener.append(.init(NotificationOutput(type: .addedInNewChat, content: chat)))
+        } else {
+            self.send(userIds: [userId], title: "\(chat.name)", text: "Добро пожаловать в чат")
+        }
+    }
+}
+
+extension UpdateCenter {
+    func send(userIds: [IdentifierType], title: String, text: String) {
+        for id in userIds {
+            firstly {
+                dataBase.run(request: DBApnsTokenRequest(userId: id))
+            }.handler { tokens in
+                for token in tokens {
+                    if let id = token.identifier {
+                        self.app.apns.send(
+                            .init(title: title, subtitle: text),
+                            to: id
+                        ).whenSuccessBlocking(onto: DispatchQueue.global(), { _ in })
+                    }
+                }
+            }.cauterize()
+        }
     }
 }

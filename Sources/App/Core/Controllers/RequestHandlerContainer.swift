@@ -69,6 +69,7 @@ extension RequestHandlerContainer {
         }.map { user in
             AuthorisationInfo(
                 identifier: user.content1.user_id,
+                token: token,
                 user: user.content1
             )
         }.done { value in

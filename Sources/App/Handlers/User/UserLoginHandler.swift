@@ -30,7 +30,8 @@ struct UserLoginHandler: IRequestHandler {
                     token: DBTokenRaw(
                         token_token: key.uuid,
                         token_secret_key: String(key.symmetricKey),
-                        token_user_id: user.user_id
+                        token_user_id: user.user_id,
+                        token_apns_token: nil
                     )
                 )
             ).map { _ in
