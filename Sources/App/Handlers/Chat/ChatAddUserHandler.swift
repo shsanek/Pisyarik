@@ -14,13 +14,12 @@ struct ChatAddUserHandler: IRequestHandler {
                     chatId: parameters.input.chatId
                 )
             )
-        }.map { result -> Void in
+        }.handler { result in
             if result.first?.count ?? 0 == 0 {
                 throw Errors.accessError.description(
                     "Пользователя нет в этом чате"
                 )
             }
-            return Void()
         }.then { _ in
             dataBase.run(
                 request: DBGetContainsUserInChat(
@@ -28,24 +27,21 @@ struct ChatAddUserHandler: IRequestHandler {
                     chatId: parameters.input.chatId
                 )
             )
-        }.map { result -> Void in
+        }.handler { result in
             if result.first?.count ?? 0 > 0 {
                 throw Errors.userAlreadyInChat.description(
                     "Пользователь уже состоит в данном чате"
                 )
             }
-            return Void()
         }.then { _ in
-            firstly {
-                dataBase.run(request: DBGetChatRequest(chatId: parameters.input.chatId))
-            }.only.map { result -> ChatsOutput.Chat in
-                if result.content1.is_personal != 0 {
-                    throw Errors.accessError.description(
-                        "Добавление в персональные чаты недоступно"
-                    )
-                }
-                return .init(result, authorisationInfo: parameters.authorisationInfo)
+            dataBase.run(request: DBGetLightChatRequest(chatId: parameters.input.chatId))
+        }.only.map { result -> ChatOutput in
+            if result.chat_type == ChatType.personal.rawValue {
+                throw Errors.accessError.description(
+                    "Добавление в персональные чаты недоступно"
+                )
             }
+            return .init(result)
         }.then { chat in
             dataBase.run(
                 request: DBAddUserInChatRequest(

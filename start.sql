@@ -63,7 +63,7 @@ CREATE TABLE `token` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 ALTER TABLE chat ADD CONSTRAINT chat_lmi_1 FOREIGN KEY (`last_message_id`) REFERENCES `message` (`identifier`);
-ALTER TABLE chat ADD COLUMN is_personal BOOLEAN NOT NULL DEFAULT 0;
+ALTER TABLE chat ADD COLUMN type char(40) NOT NULL;
 
 ALTER TABLE chat ADD COLUMN message_count INT UNSIGNED NOT NULL DEFAULT 0;
 ALTER TABLE chat_user ADD COLUMN last_read_message_id INT UNSIGNED DEFAULT NULL;
@@ -82,7 +82,7 @@ SET @alex_id = LAST_INSERT_ID ();
 INSERT INTO user(name, security_hash) VALUES ('Nikita','3c24134859c93a3dcf4714ed8578128196f5dd19a51b8d2192a22d9021ddf65a');
 SET @nikita_id = LAST_INSERT_ID ();
 
-INSERT INTO chat(name, is_personal) VALUES ('Group', 0);
+INSERT INTO chat(name, type) VALUES ('Group', 'group');
 SET @group_id = LAST_INSERT_ID ();
 
 INSERT INTO message(user_id, chat_id, body, date, type) VALUES (@alex_id, @group_id, 'Test chat', 978307200, 'SYSTEM_TEXT');
@@ -93,7 +93,7 @@ INSERT INTO chat_user(user_id, chat_id, last_read_message_id) VALUES (@den_id , 
 INSERT INTO chat_user(user_id, chat_id, last_read_message_id) VALUES (@alex_id , @group_id, @message_identifier);
 INSERT INTO chat_user(user_id, chat_id, last_read_message_id) VALUES (@nikita_id , @group_id, @message_identifier);
 
-INSERT INTO chat(name, is_personal) VALUES ('Group2', 0);
+INSERT INTO chat(name, type) VALUES ('Group2', 'group');
 SET @group_id = LAST_INSERT_ID ();
 
 INSERT INTO message(user_id, chat_id, body, date, type) VALUES (@alex_id, @group_id, 'Test chat 2', 978307200, 'SYSTEM_TEXT');
@@ -103,4 +103,3 @@ UPDATE chat SET last_message_id = @message_identifier WHERE identifier = @group_
 INSERT INTO chat_user(user_id, chat_id, last_read_message_id) VALUES (@den_id , @group_id, @message_identifier);
 INSERT INTO chat_user(user_id, chat_id, last_read_message_id) VALUES (@alex_id , @group_id, @message_identifier);
 INSERT INTO chat_user(user_id, chat_id, last_read_message_id) VALUES (@nikita_id , @group_id, @message_identifier);
-

@@ -20,7 +20,7 @@ struct ErrorDeveloperInfo: Codable {
             )
         })
     }
-    
+
     let description: String
     let error: String?
     let position: Position?

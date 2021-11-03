@@ -11,7 +11,7 @@ struct ChatMakePersonalHandler: IRequestHandler {
             dataBase.run(request: DBGetUserRequest(userId: parameters.input.userId)).only.map { (me: me, user: $0) }
         }.then { result in
             firstly { () -> Promise<String> in
-                let identifiers = ["\(result.user.identifier)", "\(result.me.identifier)"].sorted(by: >)
+                let identifiers = ["\(result.user.user_id)", "\(result.me.identifier)"].sorted(by: >)
                 return .value("SYS ##\(identifiers.joined(separator: "-"))##")
             }.then { chatName in
                 try ChatMakeHandler(isPersonal: true).handle(
@@ -26,8 +26,7 @@ struct ChatMakePersonalHandler: IRequestHandler {
                     dataBase: dataBase
                 )
             }.map { (user: result.user, chat: $0, me: result.me) }
-        }
-        .then { result in
+        }.then { result in
             dataBase.run(
                 request: DBAddUserInChatRequest(
                     userId: parameters.input.userId,
@@ -44,15 +43,15 @@ struct ChatMakePersonalHandler: IRequestHandler {
                                 isSelf: false
                             )
                         ),
-                        userId: result.user.identifier
+                        userId: result.user.user_id
                     )
                 )
             }.map { _ in
                 Output(
                     chatId: result.chat.chatId,
                     user: .init(
-                        name: result.user.content.name,
-                        userId: result.user.identifier,
+                        name: result.user.user_name,
+                        userId: result.user.user_id,
                         isSelf: false
                     )
                 )
@@ -68,6 +67,6 @@ extension ChatMakePersonalHandler {
 
     struct Output: Codable {
         let chatId: IdentifierType
-        let user: UsersOutput.User
+        let user: UserOutput
     }
 }

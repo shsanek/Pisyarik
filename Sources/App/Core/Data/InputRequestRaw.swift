@@ -1,7 +1,7 @@
 struct InputRequestRaw<Input: Decodable>: Decodable {
     let time: UInt
     let authorisation: Authorisation?
-    let parameters: Input
+    let content: Input
 }
 
 struct Authorisation: Codable {

@@ -1,7 +1,7 @@
 enum UpdateAction {
-    case newMessage(_ message: MessagesOutput.Message)
+    case newMessage(_ message: MessageOutput)
     case newPersonalChat(_ output: ChatMakePersonalHandler.Output, userId: IdentifierType)
-    case addInNewChat(_ chat: ChatsOutput.Chat, userId: IdentifierType)
+    case addInNewChat(_ chat: ChatOutput, userId: IdentifierType)
 }
 
 enum NotificationOutputType: String, Encodable {

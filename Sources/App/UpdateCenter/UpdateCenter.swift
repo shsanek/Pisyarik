@@ -45,14 +45,14 @@ final class UpdateCenter {
 }
 
 private extension UpdateCenter {
-    func newMessage(_ message: MessagesOutput.Message) {
+    func newMessage(_ message: MessageOutput) {
         dataBase.run(request: DBGetUserRequest(chatId: message.chatId)).done { result in
             self.lock.lockReading()
             defer {
                 self.lock.unlock()
             }
-            for user in result where user.identifier != message.user.userId {
-                self.listeners[user.identifier]?.append(
+            for user in result where user.user_id != message.user.userId {
+                self.listeners[user.user_id]?.append(
                     .init(
                         NotificationOutput(
                             type: .newMessage,
@@ -69,7 +69,7 @@ private extension UpdateCenter {
 
     }
 
-    func addInNewChat(_ chat: ChatsOutput.Chat, userId: IdentifierType) {
+    func addInNewChat(_ chat: ChatOutput, userId: IdentifierType) {
         self.listeners[userId]?.append(.init(NotificationOutput(type: .addedInNewChat, content: chat)))
     }
 }

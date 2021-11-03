@@ -34,19 +34,19 @@ struct UserRegistrationHandler: IRequestHandler {
                 )
             )
         }.only.then { identifier in
-            return dataBase.run(
+            dataBase.run(
                 request: DBAddTokenForUserRequest(
                     token: DBTokenRaw(
-                        token: key.uuid,
-                        secret_key: String(key.symmetricKey),
-                        user_id: identifier.identifier
+                        token_token: key.uuid,
+                        token_secret_key: String(key.symmetricKey),
+                        token_user_id: identifier.identifier
                     )
                 )
             ).map { _ in
-                return (userId: identifier.identifier, publicKey: key.publicKey)
+                (userId: identifier.identifier, publicKey: key.publicKey)
             }
         }.map { result in
-            return Output(
+            Output(
                 token: key.uuid,
                 serverPublicKey: result.publicKey,
                 userId: result.userId

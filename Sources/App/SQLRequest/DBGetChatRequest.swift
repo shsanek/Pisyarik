@@ -1,5 +1,5 @@
 struct DBGetChatRequest: IDBRequest {
-    typealias Result = DBContainer2<DBChatRaw, DBFullMessageRaw>
+    typealias Result = DBContainer5<DBChatRaw, DBMessageRaw, DBUserRaw, DBPersonalNameRaw, DBChatUserRaw>
 
     let description: String
     let request: String
@@ -10,65 +10,88 @@ extension DBGetChatRequest {
         self.description = "Get chat with user id '\(userId)'"
         self.request = """
             SELECT
-                chat.is_personal as is_personal,
-                chat.identifier as identifier,
-                chat.name as name,
-                message.user_id as author_id,
-                user.name as author_name,
-                message.chat_id as chat_id,
-                message.body as body,
-                message.date as date,
-                message.type as type,
-                message.identifier as message_id,
-                chat_user.not_read_message_count as not_read_message_count,
-                chat_user.last_read_message_id as last_read_message_id
-            FROM chat_user, chat, message, user
-            WHERE
-                chat_user.user_id = \(userId) AND
-                chat_user.chat_id = chat.identifier AND
-                message.identifier = chat.last_message_id AND
-                user.identifier = message.user_id;
+                   \(DBUserRaw.sqlGET()),
+                   \(DBMessageRaw.sqlGET),
+                   \(DBChatRaw.sqlGET),
+                   \(DBPersonalNameRaw.sqlGET),
+                   \(DBChatUserRaw.sqlGET)
+            from chat
+                    INNER JOIN chat_user
+                    ON
+                        chat.identifier = chat_user.chat_id AND
+                        chat_user.user_id = \(userId)
+
+                    INNER JOIN message
+                    ON chat.last_message_id = message.identifier
+
+                    INNER JOIN user
+                    ON message.user_id = user.identifier
+
+                    LEFT JOIN chat_user as personal_chat_user
+                    ON
+                        chat.identifier = personal_chat_user.chat_id AND
+                        chat.type = "personal" AND
+                        personal_chat_user.user_id <> \(userId)
+
+                    LEFT JOIN user as personal_user
+                    ON personal_user.identifier = personal_chat_user.user_id
+            ;
             """
-    }
-
-    init(name: String) {
-        self.description = "Get chats with name = '\(name)'"
-        self.request = "SELECT * FROM chat WHERE name = '\(name)';"
-    }
-
-    init(contains name: String) {
-        self.description = "Get chats with name contains '\(name)'"
-        self.request = "SELECT * FROM chat WHERE name LIKE BINARY '%\(name)%';"
-    }
-
-    init(chatId: IdentifierType) {
-        self.description = "Get chats with id '\(chatId)'"
-        self.request = "SELECT * FROM chat WHERE identifier = \(chatId);"
     }
 
     init(chatId: IdentifierType, userId: IdentifierType) {
         self.description = "Get chats with id '\(chatId)' for user \(userId)"
         self.request = """
             SELECT
-                chat.is_personal as is_personal,
-                chat.identifier as identifier,
-                chat.name as name,
-                message.user_id as author_id,
-                user.name as author_name,
-                message.chat_id as chat_id,
-                message.body as body,
-                message.date as date,
-                message.type as type,
-                message.identifier as message_id,
-                chat_user.not_read_message_count as not_read_message_count,
-                chat_user.last_read_message_id as last_read_message_id
-            FROM chat_user, chat, message, user
-            WHERE
-                chat.identifier = \(chatId) AND
-                chat_user.user_id = \(userId) AND
-                chat_user.chat_id = chat.identifier AND
-                message.identifier = chat.last_message_id AND
-                user.identifier = message.user_id;
+                \(DBUserRaw.sqlGET()),
+                \(DBMessageRaw.sqlGET),
+                \(DBChatRaw.sqlGET),
+                \(DBPersonalNameRaw.sqlGET),
+                \(DBChatUserRaw.sqlGET)
+            from chat
+                    INNER JOIN chat_user
+                    ON
+                        chat.identifier = chat_user.chat_id AND
+                        chat_user.user_id = \(userId) AND
+                        chat.identifier = \(chatId)
+
+                    INNER JOIN message
+                    ON chat.last_message_id = message.identifier
+
+                    INNER JOIN user
+                    ON message.user_id = user.identifier
+
+                    LEFT JOIN chat_user as personal_chat_user
+                    ON
+                        chat.identifier = personal_chat_user.chat_id AND
+                        chat.type = "personal" AND
+                        personal_chat_user.user_id <> \(userId)
+
+                    LEFT JOIN user as personal_user
+                    ON personal_user.identifier = personal_chat_user.user_id
+            ;
             """
+    }
+}
+
+struct DBGetLightChatRequest: IDBRequest {
+    typealias Result = DBChatRaw
+
+    let description: String
+    let request: String
+
+    init(name: String) {
+        self.description = "Get chats with name = '\(name)'"
+        self.request = "SELECT \(DBChatRaw.sqlGET) FROM chat WHERE name = '\(name)';"
+    }
+
+    init(contains name: String) {
+        self.description = "Get chats with name contains '\(name)'"
+        self.request = "SELECT \(DBChatRaw.sqlGET) FROM chat WHERE name LIKE BINARY '%\(name)%';"
+    }
+
+    init(chatId: IdentifierType) {
+        self.description = "Get chats with id '\(chatId)'"
+        self.request = "SELECT \(DBChatRaw.sqlGET) FROM chat WHERE identifier = \(chatId);"
     }
 }

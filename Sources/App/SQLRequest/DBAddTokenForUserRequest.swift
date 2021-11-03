@@ -7,7 +7,7 @@ struct DBAddTokenForUserRequest: IDBRequest {
     var request: String {
         """
         INSERT INTO token(token, user_id, secret_key)
-        VALUES ('\(token.token)', \(token.user_id), '\(token.secret_key)');
+        VALUES ('\(token.token_token)', \(token.token_user_id), '\(token.token_secret_key)');
         SELECT LAST_INSERT_ID () as identifier;
         """
     }

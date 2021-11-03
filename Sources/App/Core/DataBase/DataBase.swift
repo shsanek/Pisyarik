@@ -121,3 +121,22 @@ protocol IDBRequest {
     var description: String { get }
     var request: String { get }
 }
+
+extension IDataBase {
+    func sendSystemMessage(chatId: IdentifierType, message: String) -> Promise<IdentifierType> {
+        self.run(
+            request: DBAddMessageRequest(
+                message: DBMessageRaw(
+                    message_author_id: DBUserRaw.systemUserId,
+                    message_chat_id: chatId,
+                    message_date: UInt(Date.timeIntervalSinceReferenceDate),
+                    message_body: "Start chat",
+                    message_type: "SYSTEM_TEXT",
+                    message_id: 0
+                )
+            )
+        ).only.map {
+            $0.identifier
+        }
+    }
+}

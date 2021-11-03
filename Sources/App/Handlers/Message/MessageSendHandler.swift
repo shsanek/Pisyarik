@@ -15,39 +15,39 @@ struct MessageSendHandler: IRequestHandler {
                     chatId: parameters.input.chatId
                 )
             )
-        }.map { result -> Void in
+        }.handler { result in
             if result.first?.count ?? 0 == 0 {
                 throw Errors.accessError.description(
                     "Пользователя нет в этом чате"
                 )
             }
-            return Void()
         }.then { _ in
-            parameters.getUser.then { info in
-                dataBase.run(
-                    request: DBAddMessageRequest(
-                        message: DBMessageRaw(
-                            author_id: info.identifier,
-                            chat_id: parameters.input.chatId,
+            parameters.getUser
+        }.then { info in
+            dataBase.run(
+                request: DBAddMessageRequest(
+                    message: DBMessageRaw(
+                        message_author_id: info.identifier,
+                        message_chat_id: parameters.input.chatId,
+                        message_date: time,
+                        message_body: parameters.input.content,
+                        message_type: parameters.input.type,
+                        message_id: 0
+                    )
+                )
+            ).only.get { identifier in
+                parameters.updateCenter.update(
+                    action: .newMessage(
+                        .init(
+                            user: .init(name: info.name, userId: info.identifier, isSelf: false),
                             date: time,
-                            body: parameters.input.content,
-                            type: parameters.input.type
+                            content: parameters.input.content,
+                            type: parameters.input.type,
+                            messageId: identifier.identifier,
+                            chatId: parameters.input.chatId
                         )
                     )
-                ).only.get { identifier in
-                    parameters.updateCenter.update(
-                        action: .newMessage(
-                            .init(
-                                user: .init(name: info.name, userId: info.identifier, isSelf: false),
-                                date: time,
-                                content: parameters.input.content,
-                                type: parameters.input.type,
-                                messageId: identifier.identifier,
-                                chatId: parameters.input.chatId
-                            )
-                        )
-                    )
-                }
+                )
             }
         }.map { result in
             Output(messageId: result.identifier)

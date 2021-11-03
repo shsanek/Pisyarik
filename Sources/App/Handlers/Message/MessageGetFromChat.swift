@@ -6,7 +6,7 @@ struct MessageGetFromChat: IRequestHandler {
         "message/get_from_chat"
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<MessagesOutput> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<MessageListOutput> {
         Promise.value(parameters).map { _ -> Void in
             if parameters.input.limit > 100 {
                 throw Errors.internalError.description(
@@ -23,13 +23,12 @@ struct MessageGetFromChat: IRequestHandler {
                     chatId: parameters.input.chatId
                 )
             )
-        }.map { result -> Void in
+        }.handler { result in
             if result.first?.count ?? 0 == 0 {
                 throw Errors.accessError.description(
                     "Пользователя нет в этом чате"
                 )
             }
-            return Void()
         }.then { _ in
             dataBase.run(
                 request: DBGetMessage(
@@ -40,7 +39,7 @@ struct MessageGetFromChat: IRequestHandler {
                 )
             )
         }.map {
-            MessagesOutput($0, authorisationInfo: parameters.authorisationInfo)
+            MessageListOutput($0, authorisationInfo: parameters.authorisationInfo)
         }
     }
 }

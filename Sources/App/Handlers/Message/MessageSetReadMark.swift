@@ -7,7 +7,7 @@ struct MessageSetReadMark: IRequestHandler {
     }
 
     func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<Output> {
-        return parameters.getUser.then { info in
+        parameters.getUser.then { info in
             dataBase.run(
                 request: DBUpdateReadMessageRequest(
                     messageId: parameters.input.messageId,

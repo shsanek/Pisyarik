@@ -5,11 +5,11 @@ struct UserSearchHandler: IRequestHandler {
         "user/search"
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<UsersOutput> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<UserListOutput> {
         parameters.onlyLogin.then { parameters in
             dataBase.run(request: DBGetUserRequest(contains: parameters.input.name))
         }.map { result in
-            UsersOutput(result, authorisationInfo: parameters.authorisationInfo)
+            UserListOutput(result, authorisationInfo: parameters.authorisationInfo)
         }
     }
 }

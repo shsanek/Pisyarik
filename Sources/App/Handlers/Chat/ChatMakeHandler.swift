@@ -21,29 +21,18 @@ struct ChatMakeHandler: IRequestHandler {
             }
             return Void()
         }.then { _ in
-            dataBase.run(request: DBGetChatRequest(name: parameters.input.name))
-        }.map { result -> Void in
+            dataBase.run(request: DBGetLightChatRequest(name: parameters.input.name))
+        }.handler { result in
             guard result.count == 0 else {
                 throw Errors.nameAlreadyRegistry.description(
                     "Такое имя чата уже существует (ну пока вот так)"
                 )
             }
-            return Void()
         }.then { _ in
-            dataBase.run(request: DBAddChatRequest(name: parameters.input.name, isPersonal: isPersonal ? 1 : 0))
+            dataBase.run(request: DBAddChatRequest(name: parameters.input.name, type: ChatType.group.rawValue))
         }.only.then { chat -> Promise<Output> in
             parameters.getUser.then { info in
-                dataBase.run(
-                    request: DBAddMessageRequest(
-                        message: DBMessageRaw(
-                            author_id: info.identifier,
-                            chat_id: chat.identifier,
-                            date: UInt(Date.timeIntervalSinceReferenceDate),
-                            body: "Start chat",
-                            type: "SYSTEM_TEXT"
-                        )
-                    )
-                ).then { _ in
+                dataBase.sendSystemMessage(chatId: chat.identifier, message: "Start chat").then { _ in
                     dataBase.run(
                         request: DBAddUserInChatRequest(
                             userId: info.identifier,

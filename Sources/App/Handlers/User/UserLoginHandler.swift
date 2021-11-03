@@ -17,39 +17,38 @@ struct UserLoginHandler: IRequestHandler {
         let key = try Errors.loginErrors.handle("Неудаеться сгенерить семетричный ключ") {
             try CryptoUtils.generateKey(userPublicKey: parameters.input.userPublicKey)
         }
-        dataBase
-            .run(request: DBGetUserRequest(name: parameters.input.name))
-            .firstValue
-            .handler { user in
-                guard user.content.security_hash == String(parameters.input.securityHash.prefix(64)) else {
-                    throw Errors.loginErrors.description("Неправильный security_hash")
-                }
+        firstly {
+            dataBase.run(request: DBGetUserRequest(name: parameters.input.name))
+        }.firstValue.handler { user in
+            guard user.user_security_hash == String(parameters.input.securityHash.prefix(64)) else {
+                throw Errors.loginErrors.description("Неправильный security_hash")
             }
-            .then { user in
-                return dataBase.run(
-                    request: DBAddTokenForUserRequest(
-                        token: DBTokenRaw(
-                            token: key.uuid,
-                            secret_key: String(key.symmetricKey),
-                            user_id: user.identifier
-                        )
+        }
+        .then { user in
+            dataBase.run(
+                request: DBAddTokenForUserRequest(
+                    token: DBTokenRaw(
+                        token_token: key.uuid,
+                        token_secret_key: String(key.symmetricKey),
+                        token_user_id: user.user_id
                     )
-                ).map { _ in
-                    return (userId: user.identifier, publicKey: key.publicKey)
-                }
-            }.map { result in
-                return Output(
-                    token: key.uuid,
-                    serverPublicKey: result.publicKey,
-                    userId: result.userId
                 )
-            }.done { output in
-                result.resolver.fulfill(output)
-            }.catch { error in
-                var error = UserError(error)
-                error.code = Errors.loginErrors.rawValue
-                result.resolver.reject(error)
+            ).map { _ in
+                (userId: user.user_id, publicKey: key.publicKey)
             }
+        }.map { result in
+            Output(
+                token: key.uuid,
+                serverPublicKey: result.publicKey,
+                userId: result.userId
+            )
+        }.done { output in
+            result.resolver.fulfill(output)
+        }.catch { error in
+            var error = UserError(error)
+            error.code = Errors.loginErrors.rawValue
+            result.resolver.reject(error)
+        }
         return result.promise
     }
 }

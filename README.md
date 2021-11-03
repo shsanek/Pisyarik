@@ -16,7 +16,7 @@
         "token": String
         "secretKey": String // Берем хэш который собрали в login и делаем так SHA512(hash+time)
     }?
-    "parameters": {
+    "content": {
         //тут наш обьект (даже если парметров к запросу нет сюда надо все равно отправитьь пустой обьект) (дальше буду описывать только это поле Input)
     }
 }
@@ -100,7 +100,7 @@ req:
 
 ``` json
 { 
-    "parameters": {
+    "content": {
         "name": "alex10"
     }
 }
@@ -141,7 +141,7 @@ req:
 
 ``` json
 { 
-    "parameters": {
+    "content": {
         "name": "alex10"
     }
 }
@@ -177,7 +177,7 @@ req:
 ``` json
 { 
     "token":"94091781-F29B-4301-80B0-F0CF6BA103E7",
-    "parameters": {
+    "content": {
         "name": "alex"
     }
 }
@@ -247,7 +247,7 @@ req:
 ``` json
 { 
     "token":"94091781-F29B-4301-80B0-F0CF6BA103E7",
-    "parameters": {
+    "content": {
         "name": "Alex-Nikita3"
     }
 }
@@ -285,7 +285,7 @@ req:
 ``` json
 { 
     "token":"94091781-F29B-4301-80B0-F0CF6BA103E7",
-    "parameters": {
+    "content": {
         "userId": 3
     }
 }
@@ -326,7 +326,7 @@ req:
 ``` json
 { 
     "token":"94091781-F29B-4301-80B0-F0CF6BA103E7",
-    "parameters": {
+    "content": {
         "chatId": 3,
         "userId": 4
     }
@@ -355,7 +355,7 @@ res:
             message: Message?, //последние сообщение в чате
             name: String,
             chatId: IdentifierType,
-            isPersonal: Bool // пометка о том что чат персональный ( в такие чаты нельзя добавить пользователей и их имя надо получать из списка пользователей чата),
+            type: String// group | personal,
             notReadCount: Int?
             lastMessageId: Int?
         }]
@@ -367,7 +367,7 @@ req:
 ``` json
 { 
     "token":"94091781-F29B-4301-80B0-F0CF6BA103E7",
-    "parameters": { }
+    "content": { }
 }
 ```
 res:
@@ -444,7 +444,7 @@ req:
 ``` json
 { 
     "token":"94091781-F29B-4301-80B0-F0CF6BA103E7",
-    "parameters": {
+    "content": {
         "chatId": 3
     }
 }
@@ -497,7 +497,7 @@ req:
 ``` json
 { 
     "token":"94091781-F29B-430",
-    "parameters": {
+    "content": {
         "chatId": 3,
         "type": "text",
         "content": "Hello"
@@ -538,7 +538,7 @@ req:
 ``` json
 { 
     "token":"94091781-F29B-430",
-    "parameters": {
+    "content": {
         "messageId": 3,
         "chatId": 2
     }
@@ -580,7 +580,7 @@ req:
 ``` json
 { 
     "token":"94091781-F29B-430",
-    "parameters": {
+    "content": {
         "chatId": 3,
         "limit": 10,
         "lastMessageId": 2
@@ -668,7 +668,7 @@ req:
 ``` json
 { 
     "token":"94091781-F29B-430",
-    "parameters": { }
+    "content": { }
 }
 ```
 res:

@@ -6,12 +6,12 @@ struct DBAddChatRequest: IDBRequest {
     }
     var request: String {
         """
-        INSERT INTO chat(name, is_personal)
-        VALUES ('\(name)', \(isPersonal));
+        INSERT INTO chat(name, type)
+        VALUES ('\(name)', '\(type)');
         SELECT LAST_INSERT_ID () as identifier;
         """
     }
 
     let name: String
-    let isPersonal: Int
+    let type: String
 }

@@ -51,7 +51,7 @@ extension RequestHandlerContainer {
                 RequestParameters(
                     authorisationInfo: nil,
                     updateCenter: updateCenter,
-                    input: raw.parameters,
+                    input: raw.content,
                     time: raw.time
                 )
             )
@@ -59,8 +59,8 @@ extension RequestHandlerContainer {
         let token = authorisation.token
         let secret = authorisation.secretKey
         let result = Promise<RequestParameters<Input>>.pending()
-        dataBase.run(request: DBGetUserRequest(token: token)).only.handler { user in
-            let secret_key = String(user.content.secret_key?.hash(with: raw.time)?.prefix(64) ?? "")
+        dataBase.run(request: DBGetTokenUserRequest(token: token)).only.handler { container in
+            let secret_key = String(container.content2.token_secret_key.hash(with: raw.time)?.prefix(64) ?? "")
             guard
                 secret_key == String(secret.prefix(64))
             else {
@@ -68,15 +68,15 @@ extension RequestHandlerContainer {
             }
         }.map { user in
             AuthorisationInfo(
-                identifier: user.identifier,
-                name: user.content.name
+                identifier: user.content1.user_id,
+                name: user.content1.user_name
             )
         }.done { value in
             result.resolver.fulfill(
                 RequestParameters(
                     authorisationInfo: value,
                     updateCenter: updateCenter,
-                    input: raw.parameters,
+                    input: raw.content,
                     time: raw.time
                 )
             )
