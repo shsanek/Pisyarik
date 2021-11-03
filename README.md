@@ -54,6 +54,7 @@
 
 IdentifierType = UInt
 
+```
 User {
     name: String
     userId: IdentifierType
@@ -63,7 +64,10 @@ User {
     firstName: String?
     lastName: String?
 }
+```
 
+
+```
 Message {
     user: User
     date: UInt
@@ -72,6 +76,7 @@ Message {
     messageId: IdentifierType
     chatId: IdentifierType
 }
+```
 
 # Методы
 
