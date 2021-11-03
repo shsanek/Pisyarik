@@ -37,11 +37,7 @@ struct ChatMakePersonalHandler: IRequestHandler {
                     action: .newPersonalChat(
                         .init(
                             chatId: result.chat.chatId,
-                            user: .init(
-                                name: result.me.name,
-                                userId: result.me.identifier,
-                                isSelf: false
-                            )
+                            user: .init(result.me.user, authorisationInfo: nil)
                         ),
                         userId: result.user.user_id
                     )
@@ -49,11 +45,7 @@ struct ChatMakePersonalHandler: IRequestHandler {
             }.map { _ in
                 Output(
                     chatId: result.chat.chatId,
-                    user: .init(
-                        name: result.user.user_name,
-                        userId: result.user.user_id,
-                        isSelf: false
-                    )
+                    user: .init(result.me.user, authorisationInfo: nil)
                 )
             }
         }

@@ -58,6 +58,10 @@ User {
     name: String
     userId: IdentifierType
     isSelf: Bool // true - если вы этот пользователь
+    hex: String?
+    emoji: String?
+    firstName: String?
+    lastName: String?
 }
 
 Message {
@@ -223,6 +227,44 @@ res:
     }
 }
 ```
+
+### user/get_self
+
+возращает информацию о вашем пользователе
+
+``` json
+    Input {
+    }
+```
+
+``` json
+    Output: User
+```
+
+###### example:
+нетестировалось
+
+### user/update_self
+
+обновляет информацию о вашем пользователе
+
+``` json
+    Input {
+        hex: String?
+        emoji: String?
+        firstName: String?
+        lastName: String?
+    }
+```
+
+``` json
+    Output: {
+    }
+}
+```
+
+###### example:
+нетестировалось
 
 ## chat
 

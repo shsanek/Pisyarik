@@ -15,7 +15,7 @@ extension IRequestHandler {
 
 struct AuthorisationInfo {
     let identifier: IdentifierType
-    let name: String
+    let user: DBUserRaw
 }
 
 struct RequestParameters<Input: Decodable> {

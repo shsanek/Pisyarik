@@ -15,6 +15,8 @@ public func configure(_ app: Application) throws {
     rootRouter.registration(handler: UserLoginHandler())
     rootRouter.registration(handler: UserRegistrationHandler())
     rootRouter.registration(handler: UserSearchHandler())
+    rootRouter.registration(handler: UserGetSelfHandler())
+    rootRouter.registration(handler: UserUpdateSelfHandler())
 
     rootRouter.registration(handler: MessageGetFromChat())
     rootRouter.registration(handler: MessageSendHandler())

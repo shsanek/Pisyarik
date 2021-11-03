@@ -69,7 +69,7 @@ extension RequestHandlerContainer {
         }.map { user in
             AuthorisationInfo(
                 identifier: user.content1.user_id,
-                name: user.content1.user_name
+                user: user.content1
             )
         }.done { value in
             result.resolver.fulfill(

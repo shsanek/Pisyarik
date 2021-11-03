@@ -103,3 +103,8 @@ UPDATE chat SET last_message_id = @message_identifier WHERE identifier = @group_
 INSERT INTO chat_user(user_id, chat_id, last_read_message_id) VALUES (@den_id , @group_id, @message_identifier);
 INSERT INTO chat_user(user_id, chat_id, last_read_message_id) VALUES (@alex_id , @group_id, @message_identifier);
 INSERT INTO chat_user(user_id, chat_id, last_read_message_id) VALUES (@nikita_id , @group_id, @message_identifier);
+
+ALTER TABLE user ADD COLUMN `first_name` char(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL;
+ALTER TABLE user ADD COLUMN `last_name` char(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL;
+ALTER TABLE user ADD COLUMN `background_hex` char(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL;
+ALTER TABLE user ADD COLUMN `emoji` char(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL;

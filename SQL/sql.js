@@ -6,7 +6,8 @@ const connection = mysql.createConnection({
   user: "user",
   database: "arrle",
   password: "123",
-  multipleStatements: true
+  multipleStatements: true,
+  charset : 'utf8mb4'
 });
 
 connection.connect(function(err){
