@@ -1,4 +1,3 @@
-import PromiseKit
 import Foundation
 
 struct ChatGetUsersHandler: IRequestHandler {
@@ -6,7 +5,7 @@ struct ChatGetUsersHandler: IRequestHandler {
         "chat/get_users"
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<UserListOutput> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> FuturePromise<UserListOutput> {
         parameters.getUser.then { info in
             dataBase.run(
                 request: DBGetContainsUserInChat(
@@ -14,13 +13,13 @@ struct ChatGetUsersHandler: IRequestHandler {
                     chatId: parameters.input.chatId
                 )
             )
-        }.handler { result in
+        }.handle { result in
             if result.first?.count ?? 0 == 0 {
                 throw Errors.accessError.description(
                     "Пользователя нет в этом чате"
                 )
             }
-        }.then { _ in
+        }.next {
             dataBase.run(request: DBGetUserRequest(chatId: parameters.input.chatId))
         }.map { result in
             UserListOutput(result, authorisationInfo: parameters.authorisationInfo)

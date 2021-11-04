@@ -1,4 +1,3 @@
-import PromiseKit
 import Foundation
 
 struct ChatMakeHandler: IRequestHandler {
@@ -12,7 +11,7 @@ struct ChatMakeHandler: IRequestHandler {
         self.isPersonal = isPersonal
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<Output> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> FuturePromise<Output> {
         parameters.onlyLogin.map { _ -> Void in
             guard parameters.input.name.count < 40 else {
                 throw Errors.incorrectName.description(
@@ -20,19 +19,19 @@ struct ChatMakeHandler: IRequestHandler {
                 )
             }
             return Void()
-        }.then { _ in
+        }.next {
             dataBase.run(request: DBGetLightChatRequest(name: parameters.input.name))
-        }.handler { result in
+        }.handle { result in
             guard result.count == 0 else {
                 throw Errors.nameAlreadyRegistry.description(
                     "Такое имя чата уже существует (ну пока вот так)"
                 )
             }
-        }.then { _ in
+        }.next {
             dataBase.run(request: DBAddChatRequest(name: parameters.input.name, type: ChatType.group.rawValue))
-        }.only.then { chat -> Promise<Output> in
+        }.only().then { chat -> FuturePromise<Output> in
             parameters.getUser.then { info in
-                dataBase.sendSystemMessage(chatId: chat.identifier, message: "Start chat").then { _ in
+                dataBase.sendSystemMessage(chatId: chat.identifier, message: "Start chat").next {
                     dataBase.run(
                         request: DBAddUserInChatRequest(
                             userId: info.identifier,

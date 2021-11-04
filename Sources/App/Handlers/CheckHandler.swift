@@ -1,12 +1,10 @@
-import PromiseKit
-
 struct CheckHandler: IRequestHandler {
     var name: String {
         "check"
     }
 
-    func handle(_ parameters: RequestParameters<EmptyRaw>, dataBase: IDataBase) throws -> Promise<Output> {
-        dataBase.run(request: DBGetVersionRequest()).firstValue.map { result in
+    func handle(_ parameters: RequestParameters<EmptyRaw>, dataBase: IDataBase) throws -> FuturePromise<Output> {
+        dataBase.run(request: DBGetVersionRequest()).first().map { result in
             Output(dbVersion: result.version)
         }
     }

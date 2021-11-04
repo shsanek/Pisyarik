@@ -1,5 +1,7 @@
 import Foundation
-import PromiseKit
+import MySQLKit
+import Vapor
+
 #if canImport(FoundationNetworking)
     import FoundationNetworking
 #endif
@@ -10,19 +12,72 @@ final class DataBase {
     private let address = "http://localhost:4001"
     private let session = URLSession(configuration: .default)
 
-    func migration(versions: [SQLVersion]) -> Promise<Void> {
-        self.run(request: DBGetVersionRequest()).firstValue.mapResult { (result: Result<DBVersionDTO>) -> Int in
+    private lazy var pools = EventLoopGroupConnectionPool(
+        source: MySQLConnectionSource(configuration: configuration),
+        on: app.eventLoopGroup
+    )
+
+    private var configuration: MySQLConfiguration {
+        MySQLConfiguration(
+            hostname: "127.0.0.1",
+            username: "user",
+            password: "123",
+            database: "arrle",
+            tlsConfiguration: nil
+        )
+    }
+
+    private let app: Application
+
+    init(_ app: Application) {
+        self.app = app
+    }
+
+    private func perform<Result: Decodable>(_ request: String, description: String) -> FuturePromise<[Result]> {
+        var requests = request.components(separatedBy: ";").filter {
+            $0.replacingOccurrences(of: " ", with: "").replacingOccurrences(of: " ", with: "").count > 0
+        }.map { $0 + ";" }
+        guard requests.count > 0 else {
+            return .error(Errors.internalError.description("sql реквест пуст"))
+        }
+        let last = requests.removeLast()
+        return FuturePromise<[Result]> { eventLoop in
+            self.pools.withConnection(logger: self.app.logger) { connection in
+                EventLoopFuture<Void>.when(
+                    consistently: requests.map { connection.simpleQuery($0).map { _ in Void() } },
+                    eventLoop: eventLoop,
+                    skipError: false
+                ).tryNext {
+                    connection.simpleQuery(last).tryMap { row  in
+                        try row.map {
+                            try $0.sql(
+                                decoder: MySQLDataDecoder(json: JSONDecoder())
+                            ).decode(model: Result.self)
+                        }
+                    }
+                }
+            }
+        }.mapError { error in
+            let error = UserError(error)
+            return error
+        }
+    }
+
+    func migration(versions: [SQLVersion]) -> FuturePromise<Void> {
+        firstly {
+            self.run(request: DBGetVersionRequest())
+        }.only().mapResult { result -> Int in
             switch result {
-            case .fulfilled(let value):
+            case .success(let value):
                 return value.version
             default:
                 return 0
             }
-        }.then { version -> Promise<Void> in
+        }.then { version -> FuturePromise<Void>  in
             guard version < versions.count else {
-                return .value
+                return .value(Void())
             }
-            var promises = [Promise<Void>]()
+            var promises = [FuturePromise<Void>]()
             for i in version..<versions.count {
                 promises.append(
                     self.request(
@@ -32,65 +87,26 @@ final class DataBase {
                     ).asVoid()
                 )
             }
-            return Promise<Void>.when(consistently: promises)
-        }.then { _ -> Promise<Void>  in
+            return FuturePromise<Void>.when(consistently: promises)
+        }.next {
             self.run(request: DBUpdateVersionRequest(version: versions.count)).asVoid().get { _ in
                 self.version = versions.count
             }
         }
     }
 
-    func request<Result: Decodable>(description: String, request: String, type: Result.Type) -> Promise<[Result]> {
-        return self.request(description: description, request: request)
-    }
-
-    func request<Result: Decodable>(description: String, request: String) -> Promise<[Result]> {
-        let result = Promise<[Result]>.pending()
-        do {
-            guard let url = URL(string: address) else {
-                throw Errors.internalError.description("СМЕРТЬ не удалось сгенерить URL для bd")
-            }
-            let raw = SQLRequestResultRaw(
-                request: request
-            )
-            var urlRequest = URLRequest(url: url)
-            let data = try Errors.internalError.handle("не удалось сформировать запрос к bd", {
-                try JSONEncoder().encode(raw)
-            })
-            urlRequest.httpBody = data
-            urlRequest.httpMethod = "POST"
-            return session.dataPromise(with: urlRequest).map { data in
-                try Errors.internalError.handle("не удалось распарсить ответ от bd") {
-                    try JSONDecoder().decode(SQLResponseRaw<Result>.self, from: data)
-                }
-            }.map { (result: SQLResponseRaw<Result>) -> [Result] in
-                if let content = result.content {
-                    return content
-                }
-                if let error = result.error {
-                    throw NSError(
-                        domain: "SQL error",
-                        code: 2,
-                        userInfo: ["SQL": error, "request description": description]
-                    )
-                }
-                throw NSError(
-                    domain: "SQL error",
-                    code: 2,
-                    userInfo: ["request description": description]
-                )
-            }
-        } catch {
-            let error = UserError(error)
-            result.resolver.reject(error)
-        }
-        return result.promise
+    func request<Result: Decodable>(
+        description: String,
+        request: String,
+        type: Result.Type
+    ) -> FuturePromise<[Result]> {
+        return self.perform(request, description: request.description)
     }
 }
 
 extension DataBase: IDataBase {
-    func run<Request: IDBRequest>(request: Request) -> Promise<[Request.Result]> {
-        return self.request(description: request.description, request: request.request)
+    func run<Request: IDBRequest>(request: Request) -> FuturePromise<[Request.Result]> {
+        return self.perform(request.request, description: request.description)
     }
 }
 
@@ -112,7 +128,7 @@ struct SQLResponseRaw<Result: Decodable>: Decodable {
 }
 
 protocol IDataBase {
-    func run<Request: IDBRequest>(request: Request) -> Promise<[Request.Result]>
+    func run<Request: IDBRequest>(request: Request) -> FuturePromise<[Request.Result]>
 }
 
 protocol IDBRequest {
@@ -123,7 +139,7 @@ protocol IDBRequest {
 }
 
 extension IDataBase {
-    func sendSystemMessage(chatId: IdentifierType, message: String) -> Promise<IdentifierType> {
+    func sendSystemMessage(chatId: IdentifierType, message: String) -> FuturePromise<IdentifierType> {
         self.run(
             request: DBAddMessageRequest(
                 message: DBMessageRaw(
@@ -135,7 +151,7 @@ extension IDataBase {
                     message_id: 0
                 )
             )
-        ).only.map {
+        ).only().map {
             $0.identifier
         }
     }

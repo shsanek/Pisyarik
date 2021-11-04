@@ -1,4 +1,3 @@
-import PromiseKit
 import Foundation
 
 struct MessageGetFromChat: IRequestHandler {
@@ -6,8 +5,11 @@ struct MessageGetFromChat: IRequestHandler {
         "message/get_from_chat"
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<MessageListOutput> {
-        Promise.value(parameters).map { _ -> Void in
+    func handle(
+        _ parameters: RequestParameters<Input>,
+        dataBase: IDataBase
+    ) throws -> FuturePromise<MessageListOutput> {
+        FuturePromise.value(parameters).map { _ -> Void in
             if parameters.input.limit > 100 {
                 throw Errors.internalError.description(
                     "Превышен лимит в 100"
@@ -15,7 +17,7 @@ struct MessageGetFromChat: IRequestHandler {
             }
             return Void()
         }
-        .then { _ in parameters.getUser }
+        .next { parameters.getUser }
         .then { info in
             dataBase.run(
                 request: DBGetContainsUserInChat(
@@ -23,13 +25,13 @@ struct MessageGetFromChat: IRequestHandler {
                     chatId: parameters.input.chatId
                 )
             )
-        }.handler { result in
+        }.handle { result in
             if result.first?.count ?? 0 == 0 {
                 throw Errors.accessError.description(
                     "Пользователя нет в этом чате"
                 )
             }
-        }.then { _ in
+        }.next {
             dataBase.run(
                 request: DBGetMessage(
                     limit: max(100, parameters.input.limit),

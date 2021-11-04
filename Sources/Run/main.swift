@@ -12,6 +12,8 @@ var basePath = ""
 
 #if os(macOS)
 basePath = "/Users/a-shipin/ArrleServer"
+#else
+basePath = "/arrle/ArrleServer"
 #endif
 
 do {
@@ -24,9 +26,9 @@ do {
         topic: "com.urodsk.stroganina",
         environment: .sandbox
     )
-}
-catch {
-    print(error)
+} catch {
+    print("path \(basePath + "/ser/newfile.key.pem")")
+    print("APNS ERROR: \(error)")
 }
 
 app.http.server.configuration.shutdownTimeout = .seconds(60)

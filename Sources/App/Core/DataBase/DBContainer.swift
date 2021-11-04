@@ -5,8 +5,8 @@ struct DBContainer2<Content1: Decodable, Content2: Decodable> {
 
 extension DBContainer2: Decodable {
     init(from decoder: Decoder) throws {
-        self.content1 = try decoder.singleValueContainer().decode(Content1.self)
-        self.content2 = try decoder.singleValueContainer().decode(Content2.self)
+        self.content1 = try Content1(from: decoder)
+        self.content2 = try Content2(from: decoder)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -20,9 +20,9 @@ struct DBContainer3<Content1: Decodable, Content2: Decodable, Content3: Decodabl
     let content3: Content3
 
     init(from decoder: Decoder) throws {
-        self.content1 = try decoder.singleValueContainer().decode(Content1.self)
-        self.content2 = try decoder.singleValueContainer().decode(Content2.self)
-        self.content3 = try decoder.singleValueContainer().decode(Content3.self)
+        self.content1 = try Content1(from: decoder)
+        self.content2 = try Content2(from: decoder)
+        self.content3 = try Content3(from: decoder)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -37,10 +37,10 @@ struct DBContainer4<Content1: Decodable, Content2: Decodable, Content3: Decodabl
     let content4: Content4
 
     init(from decoder: Decoder) throws {
-        self.content1 = try decoder.singleValueContainer().decode(Content1.self)
-        self.content2 = try decoder.singleValueContainer().decode(Content2.self)
-        self.content3 = try decoder.singleValueContainer().decode(Content3.self)
-        self.content4 = try decoder.singleValueContainer().decode(Content4.self)
+        self.content1 = try Content1(from: decoder)
+        self.content2 = try Content2(from: decoder)
+        self.content3 = try Content3(from: decoder)
+        self.content4 = try Content4(from: decoder)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -62,11 +62,11 @@ struct DBContainer5<
     let content5: Content5
 
     init(from decoder: Decoder) throws {
-        self.content1 = try decoder.singleValueContainer().decode(Content1.self)
-        self.content2 = try decoder.singleValueContainer().decode(Content2.self)
-        self.content3 = try decoder.singleValueContainer().decode(Content3.self)
-        self.content4 = try decoder.singleValueContainer().decode(Content4.self)
-        self.content5 = try decoder.singleValueContainer().decode(Content5.self)
+        self.content1 = try Content1(from: decoder)
+        self.content2 = try Content2(from: decoder)
+        self.content3 = try Content3(from: decoder)
+        self.content4 = try Content4(from: decoder)
+        self.content5 = try Content5(from: decoder)
     }
 
     enum CodingKeys: String, CodingKey {

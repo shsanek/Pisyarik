@@ -13,14 +13,17 @@ final class UpdateCenter {
         self.app = app
     }
 
-    func addListener(id: IdentifierType) -> Promise<[NotificationOutputContainer]> {
+    func addListener(id: IdentifierType) -> FuturePromise<[NotificationOutputContainer]> {
         lock.lockWriting()
         defer {
             lock.unlock()
         }
         let listener = listeners[id] ?? make(id: id)
         listener.active = true
-        return listener.lazy.promise()
+        let promise = listener.lazy.promise()
+        return FuturePromise { eventLoop in
+            return promise.toFeature(eventLoop)
+        }
     }
 
     func update(action: UpdateAction) {
@@ -60,12 +63,12 @@ final class UpdateCenter {
 
 private extension UpdateCenter {
     func newMessage(_ message: MessageOutput) {
-        dataBase.run(request: DBGetUserRequest(chatId: message.chatId)).done { result in
+        try? dataBase.run(request: DBGetUserRequest(chatId: message.chatId)).handle { result in
             self.lock.lockReading()
             defer {
                 self.lock.unlock()
             }
-            var pushUsers = [IdentifierType]()
+            var pushUsers: [IdentifierType] = []
             for user in result where user.user_id != message.user.userId {
                 if let listener = self.listeners[user.user_id] {
                     listener.append(
@@ -81,7 +84,7 @@ private extension UpdateCenter {
                 }
             }
             self.send(userIds: pushUsers, title: "\(message.user.name)", text: "\(message.content.prefix(100))")
-        }.catch { _ in }
+        }.make(app.eventLoopGroup.next()).whenComplete { _ in }
     }
 
     func newPersonalChat(_ output: ChatMakePersonalHandler.Output, userId: IdentifierType) {
@@ -104,18 +107,20 @@ private extension UpdateCenter {
 extension UpdateCenter {
     func send(userIds: [IdentifierType], title: String, text: String) {
         for id in userIds {
-            firstly {
+            try? firstly {
                 dataBase.run(request: DBApnsTokenRequest(userId: id))
-            }.handler { tokens in
+            }.handle { tokens in
                 for token in tokens {
                     if let id = token.identifier {
                         self.app.apns.send(
                             .init(title: title, subtitle: text),
                             to: id
-                        ).whenSuccessBlocking(onto: DispatchQueue.global(), { _ in })
+                        ).whenComplete { result in
+                            print(result)
+                            }
                     }
                 }
-            }.cauterize()
+            }.make(app.eventLoopGroup.next()).whenComplete { _ in }
         }
     }
 }

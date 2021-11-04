@@ -6,8 +6,8 @@ public func configure(_ app: Application) throws {
     let workQ = DispatchQueue(label: "workq", attributes: .concurrent)
     conf.Q = (map: workQ, return: workQ)
 
-    let dataBase = DataBase()
-    try? dataBase.migration(versions: []).wait()
+    let dataBase = DataBase(app)
+    try? dataBase.migration(versions: []).make(app.eventLoopGroup.next()).wait()
 
     let rootRouter = RootRouter(dataBase: dataBase, app: app)
     rootRouter.registration(handler: CheckHandler())

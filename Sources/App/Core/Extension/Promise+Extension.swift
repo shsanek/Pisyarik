@@ -86,25 +86,14 @@ extension Promise {
     }
 }
 
-extension EventLoopPromise where Value == String {
-    func ok<Output: Encodable>(_ content: Output) {
-        let raw = OutputRequestRaw.ok(content)
-        self.send(raw)
-    }
-
-    func errors(_ errors: [Error]) {
-        let raw = OutputRequestRaw<EmptyRaw>.errors(errors)
-        self.send(raw)
-    }
-
-    private func send<Output: Encodable>(_ value: Output) {
-        if
-            let outputData = try? JSONEncoder().encode(value),
-            let text = String(data: outputData, encoding: .utf8)
-        {
-            self.succeed(text)
-        } else {
-            self.succeed(UserError.defaultError)
+extension Promise {
+    func toFeature(_ eventLoop: EventLoop) -> EventLoopFuture<T> {
+        let promise: EventLoopPromise<T> = eventLoop.makePromise()
+        self.done { result in
+            promise.succeed(result)
+        }.catch { error in
+            promise.fail(error)
         }
+        return promise.futureResult
     }
 }

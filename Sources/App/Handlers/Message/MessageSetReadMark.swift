@@ -1,4 +1,3 @@
-import PromiseKit
 import Foundation
 
 struct MessageSetReadMark: IRequestHandler {
@@ -6,7 +5,7 @@ struct MessageSetReadMark: IRequestHandler {
         "message/set_read"
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<Output> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> FuturePromise<Output> {
         parameters.getUser.then { info in
             dataBase.run(
                 request: DBUpdateReadMessageRequest(
@@ -15,7 +14,7 @@ struct MessageSetReadMark: IRequestHandler {
                     userId: info.identifier
                 )
             )
-        }.only.map { result in
+        }.only().map { result in
             Output(count: result.count)
         }
     }

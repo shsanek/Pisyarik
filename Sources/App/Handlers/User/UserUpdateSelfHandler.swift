@@ -1,11 +1,9 @@
-import PromiseKit
-
 struct UserUpdateSelfHandler: IRequestHandler {
     var name: String {
         "user/update_self"
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<EmptyRaw> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> FuturePromise<EmptyRaw> {
         parameters.getUser.map { $0.user }.map { user in
             dataBase.run(
                 request: DBUpdateUserRequest(
@@ -34,4 +32,3 @@ extension UserUpdateSelfHandler {
         let lastName: String?
     }
 }
-

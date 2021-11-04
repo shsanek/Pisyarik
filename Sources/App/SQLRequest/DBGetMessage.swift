@@ -24,7 +24,7 @@ extension DBGetMessage {
             ORDER BY message_id \(sort)
             """
     }
-    
+
     init(messageId: IdentifierType) {
         self.description = "Get message"
         self.request = """

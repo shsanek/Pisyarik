@@ -1,5 +1,3 @@
-import PromiseKit
-
 protocol IRequestHandler {
     associatedtype Input: Decodable
     associatedtype Output: Encodable
@@ -10,7 +8,7 @@ protocol IRequestHandler {
 }
 
 extension IRequestHandler {
-    typealias Result = Promise<Output>
+    typealias Result = FuturePromise<Output>
 }
 
 struct AuthorisationInfo {

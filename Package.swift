@@ -10,8 +10,9 @@ let package = Package(
         // 💧 A server-side Swift web framework.
         .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
         .package(url: "https://github.com/mxcl/PromiseKit.git", from: "6.16.0"),
-        .package(url: "https://github.com/apple/swift-crypto.git", from: "2.0.0"),
-        .package(url: "https://github.com/vapor/apns.git", from: "2.0.0")
+        .package(url: "https://github.com/apple/swift-crypto.git", from: "1.0.0"),
+        .package(url: "https://github.com/vapor/apns.git", from: "2.0.0"),
+        .package(url: "https://github.com/vapor/mysql-kit.git", from: "4.0.0")
     ],
     targets: [
         .target(
@@ -20,7 +21,8 @@ let package = Package(
                 .product(name: "Vapor", package: "vapor"),
                 .product(name: "PromiseKit", package: "PromiseKit"),
                 .product(name: "Crypto", package: "swift-crypto"),
-                .product(name: "APNS", package: "apns")
+                .product(name: "APNS", package: "apns"),
+                .product(name: "MySQLKit", package: "mysql-kit")
             ],
             swiftSettings: [
                 // Enable better optimizations when building in Release configuration. Despite the use of

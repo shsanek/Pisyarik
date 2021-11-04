@@ -1,4 +1,3 @@
-import PromiseKit
 import Foundation
 
 struct UpdateGetHandler: IRequestHandler {
@@ -7,7 +6,7 @@ struct UpdateGetHandler: IRequestHandler {
         "update/get"
     }
 
-    func handle(_ parameters: RequestParameters<EmptyRaw>, dataBase: IDataBase) throws -> Promise<Output> {
+    func handle(_ parameters: RequestParameters<EmptyRaw>, dataBase: IDataBase) throws -> FuturePromise<Output> {
         parameters.getUser.then { info in
             parameters.updateCenter.addListener(id: info.identifier)
         }.map { notifications in

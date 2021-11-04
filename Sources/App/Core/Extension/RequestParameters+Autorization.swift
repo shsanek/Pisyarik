@@ -1,21 +1,18 @@
-import PromiseKit
-
 extension RequestParameters {
-    var onlyLogin: Promise<Self> {
-        Promise.value(self).map { result in
-            if result.authorisationInfo == nil {
-                throw Errors.accessError.description("Только для авторизированных пользователей")
-            }
-            return result
+    var onlyLogin: FuturePromise<Self> {
+        self.getUser.next {
+            return .value(self)
         }
     }
 
-    var getUser: Promise<AuthorisationInfo> {
-        Promise { resolver in
-            guard let info = self.authorisationInfo else {
+    var getUser: FuturePromise<AuthorisationInfo> {
+        firstly {
+            .value(self)
+        }.map { value -> AuthorisationInfo in
+            guard let result = value.authorisationInfo else {
                 throw Errors.accessError.description("Только для авторизированных пользователей")
             }
-            resolver.fulfill(info)
+            return result
         }
     }
 }

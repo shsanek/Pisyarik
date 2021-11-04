@@ -1,4 +1,3 @@
-import PromiseKit
 import Foundation
 
 struct ChatAddUserHandler: IRequestHandler {
@@ -6,7 +5,7 @@ struct ChatAddUserHandler: IRequestHandler {
         "chat/add_user"
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<EmptyRaw> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> FuturePromise<EmptyRaw> {
         parameters.getUser.then { info in
             dataBase.run(
                 request: DBGetContainsUserInChat(
@@ -14,28 +13,28 @@ struct ChatAddUserHandler: IRequestHandler {
                     chatId: parameters.input.chatId
                 )
             )
-        }.handler { result in
+        }.handle { result in
             if result.first?.count ?? 0 == 0 {
                 throw Errors.accessError.description(
                     "Пользователя нет в этом чате"
                 )
             }
-        }.then { _ in
+        }.next {
             dataBase.run(
                 request: DBGetContainsUserInChat(
                     userId: parameters.input.userId,
                     chatId: parameters.input.chatId
                 )
             )
-        }.handler { result in
+        }.handle { result in
             if result.first?.count ?? 0 > 0 {
                 throw Errors.userAlreadyInChat.description(
                     "Пользователь уже состоит в данном чате"
                 )
             }
-        }.then { _ in
+        }.next {
             dataBase.run(request: DBGetLightChatRequest(chatId: parameters.input.chatId))
-        }.only.map { result -> ChatOutput in
+        }.only().map { result -> ChatOutput in
             if result.chat_type == ChatType.personal.rawValue {
                 throw Errors.accessError.description(
                     "Добавление в персональные чаты недоступно"

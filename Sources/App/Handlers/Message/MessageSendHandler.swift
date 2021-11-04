@@ -1,4 +1,3 @@
-import PromiseKit
 import Foundation
 
 struct MessageSendHandler: IRequestHandler {
@@ -6,7 +5,7 @@ struct MessageSendHandler: IRequestHandler {
         "message/send"
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<MessageOutput> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> FuturePromise<MessageOutput> {
         let time = UInt(Date.timeIntervalSinceReferenceDate)
         return parameters.getUser.then { info in
             dataBase.run(
@@ -15,13 +14,13 @@ struct MessageSendHandler: IRequestHandler {
                     chatId: parameters.input.chatId
                 )
             )
-        }.handler { result in
+        }.handle { result in
             if result.first?.count ?? 0 == 0 {
                 throw Errors.accessError.description(
                     "Пользователя нет в этом чате"
                 )
             }
-        }.then { _ in
+        }.next {
             parameters.getUser
         }.then { info in
             dataBase.run(
@@ -35,7 +34,7 @@ struct MessageSendHandler: IRequestHandler {
                         message_id: 0
                     )
                 )
-            ).only.get { identifier in
+            ).only().get { identifier in
                 parameters.updateCenter.update(
                     action: .newMessage(
                         .init(
@@ -51,7 +50,7 @@ struct MessageSendHandler: IRequestHandler {
             }
         }.then { result in
             dataBase.run(request: DBGetMessage(messageId: result.identifier))
-        }.only.map { raw in
+        }.only().map { raw in
             MessageOutput(
                 raw,
                 authorisationInfo: parameters.authorisationInfo

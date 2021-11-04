@@ -1,4 +1,3 @@
-import PromiseKit
 import Foundation
 
 struct ChatGetAllMyHandler: IRequestHandler {
@@ -6,7 +5,10 @@ struct ChatGetAllMyHandler: IRequestHandler {
         "chat/get_all_my"
     }
 
-    func handle(_ parameters: RequestParameters<EmptyRaw>, dataBase: IDataBase) throws -> Promise<ChatListOutput> {
+    func handle(
+        _ parameters: RequestParameters<EmptyRaw>,
+        dataBase: IDataBase
+    ) throws -> FuturePromise<ChatListOutput> {
         parameters.getUser.then { info in
             dataBase.run(request: DBGetChatRequest(userId: info.identifier))
         }.map { result in

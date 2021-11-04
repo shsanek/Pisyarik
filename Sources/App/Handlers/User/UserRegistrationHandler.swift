@@ -1,11 +1,9 @@
-import PromiseKit
-
 struct UserRegistrationHandler: IRequestHandler {
     var name: String {
         "user/registration"
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<Output> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> FuturePromise<Output> {
         guard parameters.authorisationInfo == nil else {
             throw Errors.alreadyLogin.description(
                 "Пользователь уже авторизирован почисти авторизационные токены"
@@ -22,18 +20,18 @@ struct UserRegistrationHandler: IRequestHandler {
             try CryptoUtils.generateKey(userPublicKey: parameters.input.userPublicKey)
         }
 
-        return dataBase.run(request: DBGetUserRequest(name: parameters.input.name)).handler { result in
+        return dataBase.run(request: DBGetUserRequest(name: parameters.input.name)).handle { result in
             if result.count != 0 {
                 throw Errors.alreadyLogin.description("Пользователь с таким именем уже существует")
             }
-        }.then { _ in
+        }.next {
             dataBase.run(
                 request: DBAddUserWithNameRequest(
                     name: parameters.input.name,
                     securityHash: String(parameters.input.securityHash.prefix(64))
                 )
             )
-        }.only.then { identifier in
+        }.only().then { identifier in
             dataBase.run(
                 request: DBAddTokenForUserRequest(
                     token: DBTokenRaw(

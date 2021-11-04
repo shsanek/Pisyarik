@@ -1,4 +1,3 @@
-import PromiseKit
 import Foundation
 
 struct ChatMakePersonalHandler: IRequestHandler {
@@ -6,11 +5,11 @@ struct ChatMakePersonalHandler: IRequestHandler {
         "chat/make_personal"
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Promise<Output> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> FuturePromise<Output> {
         parameters.getUser.then { me in
-            dataBase.run(request: DBGetUserRequest(userId: parameters.input.userId)).only.map { (me: me, user: $0) }
+            dataBase.run(request: DBGetUserRequest(userId: parameters.input.userId)).only().map { (me: me, user: $0) }
         }.then { result in
-            firstly { () -> Promise<String> in
+            firstly { () -> FuturePromise<String> in
                 let identifiers = ["\(result.user.user_id)", "\(result.me.identifier)"].sorted(by: >)
                 return .value("SYS ##\(identifiers.joined(separator: "-"))##")
             }.then { chatName in

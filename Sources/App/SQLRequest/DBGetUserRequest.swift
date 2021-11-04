@@ -66,7 +66,7 @@ struct DBApnsTokenRequest: IDBRequest {
             WHERE token.user_id = \(userId);
         """
     }
-    
+
     struct Result: Codable {
         let identifier: String?
     }
