@@ -47,8 +47,20 @@ struct ChatAddUserHandler: IRequestHandler {
                     userId: parameters.input.userId,
                     chatId: parameters.input.chatId
                 )
-            ).get { _ in
-                parameters.updateCenter.update(action: AddInNewChatAction(chat: chat, userId: parameters.input.userId))
+            ).then { _ in
+                dataBase.run(
+                    request: DBGetChatRequest(
+                        chatId: parameters.input.chatId,
+                        userId: parameters.input.userId
+                    )
+                ).only().get { result in
+                    parameters.updateCenter.update(
+                        action: AddInNewChatAction(
+                            chat: ChatOutput(result, authorisationInfo: nil),
+                            userId: parameters.input.userId
+                        )
+                    )
+                }
             }
         }.map { _ in
             EmptyRaw()

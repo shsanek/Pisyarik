@@ -1,6 +1,6 @@
 struct DBChatUserRaw: Codable {
-    let chat_user_last_read_message_id: IdentifierType
-    let chat_user_not_read_message_count: Int
+    let chat_user_last_read_message_id: IdentifierType?
+    let chat_user_not_read_message_count: Int?
 }
 
 extension DBChatUserRaw {

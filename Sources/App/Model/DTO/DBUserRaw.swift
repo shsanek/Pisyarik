@@ -29,4 +29,8 @@ extension DBUserRaw {
     static var systemUserId: IdentifierType {
         1
     }
+
+    static var systemUserName: String {
+        "system"
+    }
 }

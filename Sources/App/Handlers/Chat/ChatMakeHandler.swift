@@ -5,13 +5,13 @@ struct ChatMakeHandler: IRequestHandler {
         "chat/make"
     }
 
-    let isPersonal: Bool
+    let type: ChatType
 
-    init(isPersonal: Bool = false) {
-        self.isPersonal = isPersonal
+    init(type: ChatType = .group) {
+        self.type = type
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> FuturePromise<Output> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> FuturePromise<ChatOutput> {
         parameters.onlyLogin.map { _ -> Void in
             guard parameters.input.name.count < 40 else {
                 throw Errors.incorrectName.description(
@@ -28,19 +28,26 @@ struct ChatMakeHandler: IRequestHandler {
                 )
             }
         }.next {
-            dataBase.run(request: DBAddChatRequest(name: parameters.input.name, type: ChatType.group.rawValue))
+            dataBase.run(request: DBAddChatRequest(name: parameters.input.name, type: self.type.rawValue))
         }.only().then { chat -> FuturePromise<Output> in
             parameters.getUser.then { info in
-                dataBase.sendSystemMessage(chatId: chat.identifier, message: "Start chat").next {
-                    dataBase.run(
-                        request: DBAddUserInChatRequest(
-                            userId: info.identifier,
-                            chatId: chat.identifier
-                        )
+                dataBase.run(
+                    request: DBAddUserInChatRequest(
+                        userId: info.identifier,
+                        chatId: chat.identifier
                     )
+                ).next {
+                    dataBase.sendSystemMessage(chatId: chat.identifier, message: "Start chat")
                 }
-            }.map { _ in
-                Output(chatId: chat.identifier)
+            }.map { message in
+                ChatOutput(
+                    name: parameters.input.name,
+                    chatId: chat.identifier,
+                    type: ChatType.group.rawValue,
+                    message: message,
+                    lastMessageId: nil,
+                    notReadCount: 0
+                )
             }
         }
     }
@@ -49,9 +56,5 @@ struct ChatMakeHandler: IRequestHandler {
 extension ChatMakeHandler {
     struct Input: Codable {
         let name: String
-    }
-
-    struct Output: Codable {
-        let chatId: IdentifierType
     }
 }

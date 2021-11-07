@@ -5,7 +5,7 @@ struct ChatMakePersonalHandler: IRequestHandler {
         "chat/make_personal"
     }
 
-    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> FuturePromise<Output> {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> FuturePromise<ChatOutput> {
         parameters.getUser.then { me in
             dataBase.run(request: DBGetUserRequest(userId: parameters.input.userId)).only().map { (me: me, user: $0) }
         }.then { result in
@@ -13,7 +13,7 @@ struct ChatMakePersonalHandler: IRequestHandler {
                 let identifiers = ["\(result.user.user_id)", "\(result.me.identifier)"].sorted(by: >)
                 return .value("SYS ##\(identifiers.joined(separator: "-"))##")
             }.then { chatName in
-                try ChatMakeHandler(isPersonal: true).handle(
+                try ChatMakeHandler(type: .personal).handle(
                     .init(
                         authorisationInfo: parameters.authorisationInfo,
                         updateCenter: parameters.updateCenter,
@@ -35,17 +35,25 @@ struct ChatMakePersonalHandler: IRequestHandler {
             ).get { _ in
                 parameters.updateCenter.update(
                     action: NewPersonalChatAction(
-                        output: .init(
+                        chat: ChatOutput(
+                            name: result.me.user.user_name,
                             chatId: result.chat.chatId,
-                            user: .init(result.me.user, authorisationInfo: nil)
+                            type: ChatType.personal.rawValue,
+                            message: result.chat.message,
+                            lastMessageId: nil,
+                            notReadCount: 0
                         ),
                         userId: result.user.user_id
                     )
                 )
             }.map { _ in
-                Output(
+                ChatOutput(
+                    name: result.user.user_name,
                     chatId: result.chat.chatId,
-                    user: .init(result.me.user, authorisationInfo: nil)
+                    type: ChatType.personal.rawValue,
+                    message: result.chat.message,
+                    lastMessageId: nil,
+                    notReadCount: 0
                 )
             }
         }
@@ -55,10 +63,5 @@ struct ChatMakePersonalHandler: IRequestHandler {
 extension ChatMakePersonalHandler {
     struct Input: Codable {
         let userId: IdentifierType
-    }
-
-    struct Output: Codable {
-        let chatId: IdentifierType
-        let user: UserOutput
     }
 }

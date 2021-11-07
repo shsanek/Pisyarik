@@ -49,10 +49,17 @@ final class DataBase {
                     skipError: false
                 ).tryNext {
                     connection.simpleQuery(last).tryMap { row  in
-                        try row.map {
-                            try $0.sql(
-                                decoder: MySQLDataDecoder(json: JSONDecoder())
-                            ).decode(model: Result.self)
+                        do {
+                            return try row.map {
+                                try $0.sql(
+                                    decoder: MySQLDataDecoder(json: JSONDecoder())
+                                ).decode(model: Result.self)
+                            }
+                        }
+                        catch {
+                            print(last)
+                            print(error)
+                            throw error
                         }
                     }
                 }
@@ -141,21 +148,44 @@ protocol IDBRequest {
 extension IDataBase {
     func sendSystemMessage(
         chatId: IdentifierType,
-        message: String
-    ) -> FuturePromise<IdentifierType> {
-        self.run(
+        message: String,
+        updateCenter: UpdateCenter? = nil
+    ) -> FuturePromise<MessageOutput> {
+        let date = UInt(Date.timeIntervalSinceReferenceDate)
+        return self.run(
             request: DBAddMessageRequest(
                 message: DBMessageRaw(
                     message_author_id: DBUserRaw.systemUserId,
                     message_chat_id: chatId,
-                    message_date: UInt(Date.timeIntervalSinceReferenceDate),
-                    message_body: "Start chat",
+                    message_date: date,
+                    message_body: message,
                     message_type: "SYSTEM_TEXT",
                     message_id: 0
                 )
             )
         ).only().map {
             $0.identifier
+        }.then { identifier in
+            run(request: DBGetLightChatRequest(chatId: chatId)).only().map { chat in
+                MessageOutput(
+                    user: .init(
+                        name: chat.chat_name,
+                        userId: DBUserRaw.systemUserId,
+                        isSelf: false,
+                        hex: nil,
+                        emoji: nil,
+                        firstName: nil,
+                        lastName: nil
+                    ),
+                    date: date,
+                    content: message,
+                    type: "SYSTEM_TEXT",
+                    messageId: identifier,
+                    chatId: chatId
+                )
+            }
+        }.get { output in
+            updateCenter?.update(action: NewMessageAction(message: output))
         }
     }
 }
