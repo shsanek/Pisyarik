@@ -12,6 +12,8 @@
 ``` json
 {
     "time": UInt, // текущие время не должно сильно отличаться от серверного
+    "method": "name", //имя метода
+    "reuestId": "id", // id requestа
     "authorisation": {
         "token": String
         "secretKey": String // Берем хэш который собрали в login и делаем так SHA512(hash+time)
@@ -29,7 +31,9 @@
 
 ``` json
 {
-    "state": "ok" || "error"
+    "state": "ok" || "error",
+    "method": "name", //имя метода
+    "reuestId": "id", // id requestа если реквест был
     "content": {
         //тут наш контент если ok (дальше буду описывать только это поле Output)
     },
@@ -688,9 +692,9 @@ res:
 
 ## Update
 
-### update/get
+### update/add_listener
 
-Возращает список обновлений (нужен большой тайм аут > 30)
+Подписывает на ws нотификации в методе update
 
 
 ``` json
@@ -700,10 +704,6 @@ res:
 
 ``` json
 Output {
-    notifications: [{
-        type: string // типо нотификации
-        content: Any // контент этого типа нотификаций
-    }]
 }
 ```
 

@@ -1,71 +1,84 @@
-import PromiseKit
 import Foundation
+import Vapor
 
 final class Listener {
-    lazy var lazy = LazyRequest { [promise] in promise }
-    private let promise: Promise<[NotificationOutputContainer]>
+    private let killMeHandler: (Listener) -> Void
+    @Locked private var updaters: [InformationUpdater] = []
+    @Locked private var ws: WebSocket
+    private let app: Application
+    private let token: String
+    private let dataBase: IDataBase
 
-    var active = false {
-        didSet {
-            self.update()
-        }
+    init(
+        ws: WebSocket,
+        app: Application,
+        dataBase: IDataBase,
+        token: String,
+        killMeHandler: @escaping (Listener) -> Void
+    ) {
+        self.killMeHandler = killMeHandler
+        self.ws = ws
+        self.dataBase = dataBase
+        self.app = app
+        self.token = token
     }
 
-    private let task = UpdateTask()
-    @Locked var containers: [NotificationOutputContainer] = []
-
-    init(_ endBlock: @escaping (_ active: Bool) -> Void) {
-        let pending = Promise<[NotificationOutputContainer]>.pending()
-        self.promise = pending.promise
-        self.active = false
-        task.resault.done {
-            endBlock(self.active)
-            pending.resolver.fulfill(self.containers)
-        }.catch { _ in
-            endBlock(self.active)
-            pending.resolver.fulfill(self.containers)
-        }
-    }
-
-    func append(_ container: NotificationOutputContainer) {
-        self.containers.append(container)
+    func append(_ updater: InformationUpdater) {
+        self.updaters.append(updater)
         self.update()
     }
 
+    func updateConnect(_ ws: WebSocket) {
+        self.ws = ws
+        ws.onClose.whenComplete { [weak self] _ in
+            self?.closeConnect(ws)
+            print("close connect")
+        }
+        self.update()
+    }
+
+    private func closeConnect(_ ws: WebSocket) {
+        guard self.ws === ws else {
+            self.update()
+            return
+        }
+        DispatchQueue.global().asyncAfter(deadline: .now() + 30) { [weak self] in
+            if self?.ws === ws {
+                self?.kill()
+            }
+        }
+    }
+
+    private func kill() {
+        killMeHandler(self)
+        for updater in updaters {
+            updater.send(token: token, dataBase: dataBase, app: app)
+        }
+    }
+
     private func update() {
-        guard self.active else { return }
-        if containers.count > 20 {
-            task.cancel()
-        } else if containers.count > 0 {
-            task.update()
+        let updaters = self.updaters
+        self.updaters.removeFirst(updaters.count)
+        let content = UpdateOutput(notifications: updaters.map { $0.container })
+        let output = OutputRequestRaw.ok(content, requestId: nil, method: "update")
+        let data = try? JSONEncoder().encode(output)
+        guard let data = data else {
+            return
+        }
+        let promise: EventLoopPromise<Void> = app.eventLoopGroup.next().makePromise()
+        ws.send(raw: data, opcode: .text, promise: promise)
+        promise.futureResult.whenComplete { [weak self, ws] result in
+            switch result {
+            case .failure:
+                self?.updaters.insert(contentsOf: updaters, at: 0)
+                self?.closeConnect(ws)
+            case .success:
+                break
+            }
         }
     }
 }
 
-final class UpdateTask {
-    let resault: Promise<Void>
-
-    private let updateResolver: Resolver<Void>
-    private let cancelResolver: Resolver<Void>
-
-    private let scheduler = Scheduler(defaultDelay: 0.5)
-
-    init(_ maxTime: Double = 30) {
-        let updatePending = Promise<Void>.pending()
-        let cancelPending = Promise<Void>.pending()
-        self.updateResolver = updatePending.resolver
-        self.cancelResolver = cancelPending.resolver
-        let max: Promise<Void>  = after(seconds: maxTime).asVoid()
-        self.resault = race([max, updatePending.promise, cancelPending.promise])
-    }
-
-    func update() {
-        scheduler.schedule { [weak self] in
-            self?.updateResolver.fulfill(())
-        }
-    }
-
-    func cancel() {
-        self.cancelResolver.fulfill(())
-    }
+private struct UpdateOutput: Encodable {
+    let notifications: [NotificationOutputContainer]
 }

@@ -1,3 +1,4 @@
+import WebSocketKit
 protocol IRequestHandler {
     associatedtype Input: Decodable
     associatedtype Output: Encodable
@@ -22,4 +23,5 @@ struct RequestParameters<Input: Decodable> {
     let updateCenter: UpdateCenter
     let input: Input
     let time: UInt
+    let ws: WebSocket?
 }

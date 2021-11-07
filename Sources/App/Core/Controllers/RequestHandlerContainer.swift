@@ -1,42 +1,58 @@
 import Vapor
 
+protocol IRequestHandlerContainer {
+    var name: String { get }
+
+    func handle(
+        _ data: ByteBuffer?,
+        dataBase: IDataBase,
+        updateCenter: UpdateCenter,
+        ws: WebSocket?
+    ) -> FuturePromise<String>
+}
+
 struct RequestHandlerContainer<Handler: IRequestHandler> {
+    let name: String
+
     private let handler: Handler
 
     init(handler: Handler) {
+        self.name = handler.name
         self.handler = handler
     }
 }
 
-extension RequestHandlerContainer {
-    func handle(_ request: Request, dataBase: IDataBase, updateCenter: UpdateCenter) -> EventLoopFuture<String> {
-        let result = try? FuturePromise.value(request).map { request -> InputRequestRaw<Handler.Input> in
-            guard var bytes = request.body.data else {
+extension RequestHandlerContainer: IRequestHandlerContainer {
+    func handle(
+        _ data: ByteBuffer?,
+        dataBase: IDataBase,
+        updateCenter: UpdateCenter,
+        ws: WebSocket?
+    ) -> FuturePromise<String> {
+        return firstly { () -> FuturePromise<InputRequestRaw<Handler.Input>> in
+            guard let bf = data else {
                 throw Errors.internalError.description("Так забыл тело к запросу пришить")
             }
-            let optionRaw = try Errors.internalError.handle("Чет с json проверь параметры") {
-                try bytes.readJSONDecodable(
-                    InputRequestRaw<Handler.Input>.self,
-                    length: bytes.readableBytes
-                )
-            }
-            guard let raw = optionRaw else {
-                throw Errors.internalError.description("JSON nil оч странное поведение пни сервериста")
-            }
+            let raw = try bf.json(type: InputRequestRaw<Handler.Input>.self)
 //            guard abs(Int64(raw.time) - Int64(Date.serverTime)) < 1000 * 60 else {
 //                throw NSError(domain: "Time to disperse by more than 10 minutes", code: 1, userInfo: nil)
 //            }
-            return raw
-        }.then { raw in
-            try self.checkToken(raw, dataBase: dataBase, updateCenter: updateCenter)
-        }.then { parameters  in
-            try handler.handle(parameters, dataBase: dataBase)
-        }.mapToResponse().make(request.eventLoop)
-        return result ?? .defaultError(request.eventLoop)
+            return .value(raw)
+        }.then { raw -> FuturePromise<String> in
+            return try self.checkToken(
+                raw,
+                ws: ws,
+                dataBase: dataBase,
+                updateCenter: updateCenter
+            ).then { parameters in
+                try handler.handle(parameters, dataBase: dataBase)
+            }.mapToResponse(requestId: raw.reuestId, method: handler.name)
+        }
     }
 
     private func checkToken<Input: Decodable>(
         _ raw: InputRequestRaw<Input>,
+        ws: WebSocket?,
         dataBase: IDataBase,
         updateCenter: UpdateCenter
     ) throws -> FuturePromise<RequestParameters<Input>> {
@@ -46,7 +62,8 @@ extension RequestHandlerContainer {
                     authorisationInfo: nil,
                     updateCenter: updateCenter,
                     input: raw.content,
-                    time: raw.time
+                    time: raw.time,
+                    ws: ws
                 )
             )
         }
@@ -70,7 +87,8 @@ extension RequestHandlerContainer {
                 authorisationInfo: value,
                 updateCenter: updateCenter,
                 input: raw.content,
-                time: raw.time
+                time: raw.time,
+                ws: ws
             )
         }.mapError { error in
             var error = UserError(error)

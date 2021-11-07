@@ -11,5 +11,6 @@
 		ssl: {
 			key: fs.readFileSync('key/key.pem', 'utf8'),
 			cert: fs.readFileSync('key/certificate.pem', 'utf8')
-		}
+		},
+        ws: true
 	}).listen(8443);

@@ -1,17 +1,5 @@
-enum UpdateAction {
-    case newMessage(_ message: MessageOutput)
-    case newPersonalChat(_ output: ChatMakePersonalHandler.Output, userId: IdentifierType)
-    case addInNewChat(_ chat: ChatOutput, userId: IdentifierType)
-}
-
-enum NotificationOutputType: String, Encodable {
-    case newMessage
-    case newPersonalChat
-    case addedInNewChat
-}
-
 struct NotificationOutput<Content: Encodable>: Encodable {
-    let type: NotificationOutputType
+    let type: NotificationType
     let content: Content
 }
 

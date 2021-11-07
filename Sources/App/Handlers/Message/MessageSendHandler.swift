@@ -36,8 +36,8 @@ struct MessageSendHandler: IRequestHandler {
                 )
             ).only().get { identifier in
                 parameters.updateCenter.update(
-                    action: .newMessage(
-                        .init(
+                    action: NewMessageAction(
+                        message: .init(
                             user: .init(info.user, authorisationInfo: nil),
                             date: time,
                             content: parameters.input.content,

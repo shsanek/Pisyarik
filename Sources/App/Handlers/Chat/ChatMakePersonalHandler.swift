@@ -20,7 +20,8 @@ struct ChatMakePersonalHandler: IRequestHandler {
                         input: .init(
                             name: chatName
                         ),
-                        time: parameters.time
+                        time: parameters.time,
+                        ws: parameters.ws
                     ),
                     dataBase: dataBase
                 )
@@ -33,8 +34,8 @@ struct ChatMakePersonalHandler: IRequestHandler {
                 )
             ).get { _ in
                 parameters.updateCenter.update(
-                    action: .newPersonalChat(
-                        .init(
+                    action: NewPersonalChatAction(
+                        output: .init(
                             chatId: result.chat.chatId,
                             user: .init(result.me.user, authorisationInfo: nil)
                         ),

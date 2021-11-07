@@ -57,17 +57,37 @@ struct DBApnsTokenRequest: IDBRequest {
     let description: String
     let request: String
 
-    init(userId: IdentifierType) {
+    init(token: String) {
         self.description = "Get apns token"
         self.request = """
             SELECT
                 token.apns_token as identifier
+            FROM token
+            WHERE token.token = \(token);
+        """
+    }
+
+    struct Result: Codable {
+        let identifier: String?
+    }
+}
+
+struct DBGetUserTokenRequest: IDBRequest {
+
+    let description: String
+    let request: String
+
+    init(userId: IdentifierType) {
+        self.description = "Get apns token"
+        self.request = """
+            SELECT
+                token.token as identifier
             FROM token
             WHERE token.user_id = \(userId);
         """
     }
 
     struct Result: Codable {
-        let identifier: String?
+        let identifier: String
     }
 }

@@ -48,7 +48,7 @@ struct ChatAddUserHandler: IRequestHandler {
                     chatId: parameters.input.chatId
                 )
             ).get { _ in
-                parameters.updateCenter.update(action: .addInNewChat(chat, userId: parameters.input.userId))
+                parameters.updateCenter.update(action: AddInNewChatAction(chat: chat, userId: parameters.input.userId))
             }
         }.map { _ in
             EmptyRaw()

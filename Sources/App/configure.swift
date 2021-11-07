@@ -44,4 +44,6 @@ public func configure(_ app: Application) throws {
     app.get { _ in
         return UserError.notFoundError
     }
+
+    rootRouter.activeWebSocket()
 }

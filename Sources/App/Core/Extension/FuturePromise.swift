@@ -144,15 +144,15 @@ extension FuturePromise where Value: RandomAccessCollection {
 }
 
 extension FuturePromise where Value: Encodable {
-    func mapToResponse() -> FuturePromise<String> {
+    func mapToResponse(requestId: String?, method: String) -> FuturePromise<String> {
         self.mapResult { result -> String in
             do {
                 switch result {
                 case.success(let object):
-                    let raw = OutputRequestRaw.ok(object)
+                    let raw = OutputRequestRaw.ok(object, requestId: requestId, method: method)
                     return try self.makeBodyText(raw)
                 case .failure(let error):
-                    let raw = OutputRequestRaw<EmptyRaw>.errors([error])
+                    let raw = OutputRequestRaw<EmptyRaw>.errors([error], requestId: requestId, method: method)
                     return try self.makeBodyText(raw)
                 }
             } catch {

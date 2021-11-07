@@ -139,7 +139,10 @@ protocol IDBRequest {
 }
 
 extension IDataBase {
-    func sendSystemMessage(chatId: IdentifierType, message: String) -> FuturePromise<IdentifierType> {
+    func sendSystemMessage(
+        chatId: IdentifierType,
+        message: String
+    ) -> FuturePromise<IdentifierType> {
         self.run(
             request: DBAddMessageRequest(
                 message: DBMessageRaw(
