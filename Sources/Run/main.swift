@@ -1,6 +1,9 @@
 import App
 import Vapor
 import APNS
+import NIOSSL
+
+DebugeNotificationCenter.send("Сервер скомпилирован и запущен")
 
 var env = try Environment.detect()
 
@@ -24,10 +27,9 @@ do {
             pemPassword: nil
         ),
         topic: "com.urodsk.stroganina",
-        environment: .sandbox
+        environment: .production
     )
 } catch {
-    print("path \(basePath + "/ser/newfile.key.pem")")
     print("APNS ERROR: \(error)")
 }
 
