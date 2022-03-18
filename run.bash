@@ -1,4 +1,5 @@
 TELEGRAM_BOT_TOKEN=$1
+TELEGRAM_BOT_CHAT=$2
 
 export ARRLE_STOP="STOP"
 sudo kill -9 `sudo lsof -t -i:8443`
@@ -22,7 +23,7 @@ while [ $STATE != "STOP" ] && [ "$tryes" -gt 0 ]; do
 
     sleep 5
 
-    swift run 2>&1 | tee $fileLog
+    swift run -botToken bot$TELEGRAM_BOT_TOKEN -botChat $TELEGRAM_BOT_CHAT  2>&1 | tee $fileLog
 
     sudo kill -9 `sudo lsof -t -i:8080`
 
@@ -31,9 +32,9 @@ while [ $STATE != "STOP" ] && [ "$tryes" -gt 0 ]; do
     if [ $STATE != "STOP" ]; then
         curl -X POST \
             -H 'Content-Type: application/json' \
-            -d '{"chat_id": "-543384352", "text": "Чет не так сервер наебнулся"}' \
+            -d "{\"chat_id\": \"${TELEGRAM_BOT_CHAT}\", \"text\": \"Чет не так сервер наебнулся\"}" \
             https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage
-        curl -F document=@"$fileLog" https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendDocument?chat_id=-543384352
+        curl -F document=@"$fileLog" https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendDocument?chat_id=$TELEGRAM_BOT_CHAT
     fi
 done
 

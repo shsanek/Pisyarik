@@ -3,6 +3,12 @@ import Vapor
 import APNS
 import NIOSSL
 
+let parameters = CommandLine.parameters
+
+if let token = parameters.value("botToken"), let botChat = parameters.value("botChat") {
+    DebugeNotificationCenter.setup(token: token, chatID: botChat)
+}
+
 DebugeNotificationCenter.send("Сервер скомпилирован и запущен")
 
 var env = try Environment.detect()
@@ -30,6 +36,7 @@ do {
         environment: .production
     )
 } catch {
+    DebugeNotificationCenter.send("APNS ERROR: \(error)")
     print("APNS ERROR: \(error)")
 }
 

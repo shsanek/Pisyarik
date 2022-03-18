@@ -1,3 +1,10 @@
+CREATE USER 'user'@'localhost' IDENTIFIED BY '123';
+GRANT ALL PRIVILEGES ON * . * TO 'user'@'localhost';
+
+DROP DATABASE arrle;
+CREATE DATABASE arrle;
+USE arrle;
+
 ALTER TABLE chat DROP CONSTRAINT chat_lmi_1;
 ALTER TABLE chat_user DROP CONSTRAINT chat_user_lrmi_1;
 ALTER TABLE chat DROP CONSTRAINT chat_ibfk_1;
@@ -85,7 +92,7 @@ SET @nikita_id = LAST_INSERT_ID ();
 INSERT INTO chat(name, type) VALUES ('Group', 'group');
 SET @group_id = LAST_INSERT_ID ();
 
-INSERT INTO message(user_id, chat_id, body, date, type) VALUES (@alex_id, @group_id, 'Test chat', 978307200, 'SYSTEM_TEXT');
+INSERT INTO message(user_id, chat_id, body, date, type) VALUES (@alex_id, @group_id, 'Test chat', 97830720, 'SYSTEM_TEXT');
 SET @message_identifier = LAST_INSERT_ID ();
 UPDATE chat SET last_message_id = @message_identifier WHERE identifier = @group_id;
 
@@ -96,7 +103,7 @@ INSERT INTO chat_user(user_id, chat_id, last_read_message_id) VALUES (@nikita_id
 INSERT INTO chat(name, type) VALUES ('Group2', 'group');
 SET @group_id = LAST_INSERT_ID ();
 
-INSERT INTO message(user_id, chat_id, body, date, type) VALUES (@alex_id, @group_id, 'Test chat 2', 978307200, 'SYSTEM_TEXT');
+INSERT INTO message(user_id, chat_id, body, date, type) VALUES (@alex_id, @group_id, 'Test chat 2', 97830720, 'SYSTEM_TEXT');
 SET @message_identifier = LAST_INSERT_ID ();
 UPDATE chat SET last_message_id = @message_identifier WHERE identifier = @group_id;
 

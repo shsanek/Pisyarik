@@ -1,11 +1,7 @@
 import Vapor
-import PromiseKit
 
 // configures your application
 public func configure(_ app: Application) throws {
-    let workQ = DispatchQueue(label: "workq", attributes: .concurrent)
-    conf.Q = (map: workQ, return: workQ)
-
     let dataBase = DataBase(app)
     try? dataBase.migration(versions: []).make(app.eventLoopGroup.next()).wait()
 

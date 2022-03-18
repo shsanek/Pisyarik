@@ -83,15 +83,6 @@
         }
       },
       {
-        "package": "PromiseKit",
-        "repositoryURL": "https://github.com/mxcl/PromiseKit.git",
-        "state": {
-          "branch": null,
-          "revision": "00afea5360bf1c02ac83209c2c8991f73b5a4e7d",
-          "version": "6.16.1"
-        }
-      },
-      {
         "package": "routing-kit",
         "repositoryURL": "https://github.com/vapor/routing-kit.git",
         "state": {
