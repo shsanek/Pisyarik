@@ -3,11 +3,8 @@ import Vapor
 import APNS
 import NIOSSL
 
-let parameters = CommandLine.parameters
 
-if let token = parameters.value("botToken"), let botChat = parameters.value("botChat") {
-    DebugeNotificationCenter.setup(token: token, chatID: botChat)
-}
+DebugeNotificationCenter.setup(token: "", chatID: "")
 
 DebugeNotificationCenter.send("Сервер скомпилирован и запущен")
 

@@ -26,9 +26,10 @@ final class TelegramNotificationCenter {
         var request = URLRequest(url: url)
         request.httpBody = data
         request.httpMethod = "POST"
-        URLSession().dataTask(with: request, completionHandler: { _,_,_ in
-            // тут наверно log
-        }).resume()
+        request.allHTTPHeaderFields?["Content-Type"] = "application/json"
+        URLSession(configuration: .default).dataTask(with: request) { _, _, _ in
+            // log for log
+        }.resume()
     }
 }
 

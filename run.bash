@@ -23,7 +23,7 @@ while [ $STATE != "STOP" ] && [ "$tryes" -gt 0 ]; do
 
     sleep 5
 
-    swift run -botToken bot$TELEGRAM_BOT_TOKEN -botChat $TELEGRAM_BOT_CHAT  2>&1 | tee $fileLog
+    ~/swift-5.6-RELEASE-ubuntu18.04/usr/bin/swift run server 2>&1 | tee $fileLog
 
     sudo kill -9 `sudo lsof -t -i:8080`
 
