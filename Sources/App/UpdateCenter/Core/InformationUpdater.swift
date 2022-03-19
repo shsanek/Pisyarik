@@ -36,9 +36,11 @@ extension InformationUpdater {
                         to: id
                     ).whenComplete { result in
                         print(result)
-                        }
+                    }
                 }
             }
-        }.make(app.eventLoopGroup.next()).whenComplete { _ in }
+        }.make(app.eventLoopGroup.next()).whenComplete { result in
+            print(result)
+        }
     }
 }

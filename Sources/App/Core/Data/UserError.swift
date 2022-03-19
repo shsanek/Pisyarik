@@ -44,6 +44,7 @@ enum Errors: String {
 
     case userAlreadyInChat
     case loginErrors
+    case sqlError
 
     case internalError
 }

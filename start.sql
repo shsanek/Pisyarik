@@ -1,4 +1,4 @@
-CREATE USER 'user'@'localhost' IDENTIFIED BY '123';
+CREATE USER 'user'@'localhost' IDENTIFIED WITH mysql_native_password BY '123';
 GRANT ALL PRIVILEGES ON * . * TO 'user'@'localhost';
 
 DROP DATABASE arrle;

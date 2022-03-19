@@ -62,7 +62,7 @@ final class DataBase {
                 }
             }
         }.mapError { error in
-            let error = UserError(error)
+            let error = Errors.sqlError.description("Произошла ошибка при запросе к БД", error: error)
             return error
         }
     }

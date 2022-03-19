@@ -3,10 +3,11 @@ import Vapor
 import APNS
 import NIOSSL
 
-
+#if !os(macOS)
 DebugeNotificationCenter.setup(token: "", chatID: "")
+#endif
 
-DebugeNotificationCenter.send("Сервер скомпилирован и запущен")
+DebugeNotificationCenter.send("Запускаю сервер...")
 
 var env = try Environment.detect()
 
@@ -39,4 +40,5 @@ do {
 
 defer { app.shutdown() }
 try configure(app)
+DebugeNotificationCenter.send("Настройкка сервера завершена. Сервер запущен")
 try app.run()

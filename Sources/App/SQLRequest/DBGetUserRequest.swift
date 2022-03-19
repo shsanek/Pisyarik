@@ -63,7 +63,7 @@ struct DBApnsTokenRequest: IDBRequest {
             SELECT
                 token.apns_token as identifier
             FROM token
-            WHERE token.token = \(token);
+            WHERE token.token = '\(token)';
         """
     }
 

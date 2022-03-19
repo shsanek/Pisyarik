@@ -1,6 +1,0 @@
-while [ 1 ] do
-    swift run 2>&1 | tee log/swift-$(date +"%Y_%m_%d_%I_%M_%p").log
-done
-
-
-//
