@@ -1,6 +1,6 @@
 # Клиент 
 
-Клиент для [ios](https://github.com/NikitaSarin/Stroganina)
+Репозиторий клиента для [ios](https://github.com/NikitaSarin/Stroganina)
 
 # Че тут
 
