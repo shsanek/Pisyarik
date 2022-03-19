@@ -1,6 +1,6 @@
 TELEGRAM_BOT_TOKEN=$1
 TELEGRAM_BOT_CHAT=$2
-BUILD_TYPE="debug"
+BUILD_TYPE="release"
 
 sendMessage () {
     local text="$1"
@@ -17,11 +17,12 @@ sendFile () {
 
 sendMessage "Начинаем сборку проэкта в ${BUILD_TYPE} режиме (в релизном занимает до 15 минут)."
 fileLog="log/$(date +"%Y_%m_%d_%I_%M_%p").log"
-if swift build -c $BUILD_TYPE --product server 2>&1 | tee $fileLog; then
-    sendMessage "Cборка прошла успешно"
-else
+swift build -c $BUILD_TYPE --product server 2>&1 | tee $fileLog
+if [ $? -ne 0 ]; then
     sendFile "Во время сборки что то пошло не так исполнение не будет продолжено" $fileLog
     exit 1
+else
+    sendMessage "Cборка прошла успешно ${output}"
 fi
 
 sendMessage "Копируем в исполняемую категорию. Останваливаем старый проект перезапускаем прокси, запускаем демона"
@@ -30,7 +31,7 @@ export ARRLE_STOP="STOP"
 sudo kill -9 `sudo lsof -t -i:8443`
 sudo kill -9 `sudo lsof -t -i:8080`
 sleep 5
-scp -r build .build
+scp .build/$BUILD_TYPE/server run/$BUILD_TYPE/server
 export ARRLE_STOP="RUN"
 tryes=5
 ./run_proxy.bash &
@@ -46,7 +47,7 @@ while [ "$STATE" != "STOP" ] && [ "$tryes" -gt 0 ]; do
 
     sleep 5
 
-    ./build/$BUILD_TYPE/server 2>&1 | tee $fileLog
+    ./run/$BUILD_TYPE/server 2>&1 | tee $fileLog
 
     sudo kill -9 `sudo lsof -t -i:8080`
 
