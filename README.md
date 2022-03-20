@@ -1,3 +1,7 @@
+# Клиент 
+
+Репозиторий клиента для [ios](https://github.com/NikitaSarin/Stroganina)
+
 # Че тут
 
 короче сейчас есть 9 методов
