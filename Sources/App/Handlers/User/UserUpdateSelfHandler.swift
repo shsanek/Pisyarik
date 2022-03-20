@@ -4,7 +4,7 @@ struct UserUpdateSelfHandler: IRequestHandler {
     }
 
     func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> FuturePromise<EmptyRaw> {
-        parameters.getUser.map { $0.user }.map { user in
+        parameters.getUser.map { $0.user }.then { user in
             dataBase.run(
                 request: DBUpdateUserRequest(
                     user: .init(

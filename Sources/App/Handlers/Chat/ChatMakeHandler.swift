@@ -21,12 +21,6 @@ struct ChatMakeHandler: IRequestHandler {
             return Void()
         }.next {
             dataBase.run(request: DBGetLightChatRequest(name: parameters.input.name))
-        }.handle { result in
-            guard result.count == 0 else {
-                throw Errors.nameAlreadyRegistry.description(
-                    "Такое имя чата уже существует (ну пока вот так)"
-                )
-            }
         }.next {
             dataBase.run(request: DBAddChatRequest(name: parameters.input.name, type: self.type.rawValue))
         }.only().then { chat -> FuturePromise<Output> in

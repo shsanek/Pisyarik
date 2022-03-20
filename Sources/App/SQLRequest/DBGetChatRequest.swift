@@ -6,7 +6,7 @@ struct DBGetChatRequest: IDBRequest {
 }
 
 extension DBGetChatRequest {
-    init(userId: IdentifierType) {
+    init(userId: IdentifierType, personalChatName: String? = nil) {
         self.description = "Get chat with user id '\(userId)'"
         self.request = """
             SELECT
@@ -20,6 +20,7 @@ extension DBGetChatRequest {
                     ON
                         chat.identifier = chat_user.chat_id AND
                         chat_user.user_id = \(userId)
+                        \(personalChatName.flatMap { "AND chat.name = '\($0)'" } ?? "")
 
                     INNER JOIN message
                     ON chat.last_message_id = message.identifier

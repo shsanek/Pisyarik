@@ -84,6 +84,12 @@ extension FuturePromise {
             try maker($0).tryMap(block)
         }
     }
+    
+    func map<NewValue>(_ block: @escaping (Value) throws -> FuturePromise<NewValue>) -> FuturePromise<NewValue> {
+        FuturePromise<NewValue> { eventLoop in
+            try maker(eventLoop).tryFlatMap { try block($0).maker(eventLoop) }
+        }
+    }
 
     func handle(_ block: @escaping (Value) throws -> Void) -> FuturePromise<Value> {
         FuturePromise<Value> {

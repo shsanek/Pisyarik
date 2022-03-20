@@ -4,15 +4,15 @@ final class UserSetApnsHandler: IRequestHandler {
     }
 
     func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> FuturePromise<EmptyRaw> {
-        parameters.getUser.map { aut in
+        parameters.getUser.then { aut in
             dataBase.run(
                 request: DBUpdateApnsRequest(
                     apnsToken: parameters.input.token,
                     token: aut.token
                 )
             )
-        }.map { _ in
-            EmptyRaw()
+        }.map { result in
+            return EmptyRaw()
         }
     }
 }
