@@ -18,7 +18,7 @@ extension DBGetUserRequest {
 
     init(contains name: String) {
         self.description = "Get users with name contains '\(name)'"
-        self.request = "SELECT \(DBUserRaw.sqlGET()) FROM user WHERE name LIKE BINARY '%\(name)%' LIMIT 50;"
+        self.request = "SELECT \(DBUserRaw.sqlGET()) FROM user WHERE LOWER(name) LIKE '%\(name.lowercased())%' LIMIT 50;"
     }
 
     init(chatId: IdentifierType) {
