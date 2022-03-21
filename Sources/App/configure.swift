@@ -26,6 +26,8 @@ public func configure(_ app: Application) throws {
     rootRouter.registration(handler: ChatGetAllMyHandler())
     rootRouter.registration(handler: ChatMakePersonalHandler())
 
+    rootRouter.registration(handler: SystemGetVersionHandler(version: 1))
+    
     rootRouter.registration(handler: UpdateGetHandler())
 
     app.get("**".pathComponents) { _ in

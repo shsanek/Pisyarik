@@ -8,6 +8,22 @@ protocol IRequestHandler {
     func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Result
 }
 
+protocol IAutorizationOnlyRequestHandler: IRequestHandler {
+    func handle(
+        _ parameters: RequestParameters<Input>,
+        authorisationInfo: AuthorisationInfo,
+        dataBase: IDataBase
+    ) throws -> Result
+}
+
+extension IAutorizationOnlyRequestHandler {
+    func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> Result {
+        parameters.getUser.then { me in
+            try handle(parameters, authorisationInfo: me, dataBase: dataBase)
+        }
+    }
+}
+
 extension IRequestHandler {
     typealias Result = FuturePromise<Output>
 }

@@ -51,15 +51,12 @@ final class Listener {
 
     private func kill() {
         killMeHandler(self)
-        for updater in updaters {
-            updater.send(token: token, dataBase: dataBase, app: app)
-        }
     }
 
     private func update() {
         let updaters = self.updaters
         self.updaters.removeFirst(updaters.count)
-        let content = UpdateOutput(notifications: updaters.map { $0.container })
+        let content = UpdateOutput(notifications: updaters.map { $0.output })
         let output = OutputRequestRaw.ok(content, requestId: nil, method: "update")
         let data = try? JSONEncoder().encode(output)
         guard let data = data else {
@@ -80,5 +77,5 @@ final class Listener {
 }
 
 private struct UpdateOutput: Encodable {
-    let notifications: [NotificationOutputContainer]
+    let notifications: [NotificationOutput]
 }

@@ -1,5 +1,5 @@
 struct MessageOutput: Codable {
-    let user: UserOutput
+    var user: UserOutput
     let date: UInt
     let content: String
     let type: String
@@ -18,6 +18,14 @@ extension MessageOutput {
         self.content = raw.content2.message_body
         self.type = raw.content2.message_type
         self.chatId = raw.content2.message_chat_id
+    }
+}
+
+extension MessageOutput {
+    func convertToSelf() -> Self {
+        var output = self
+        output.user.isSelf = true
+        return output
     }
 }
 

@@ -1,26 +1,24 @@
 import Vapor
 
 struct NewMessageAction {
+    let autor: AuthorisationInfo?
     let message: MessageOutput
 }
 
 extension NewMessageAction: IUpdateAction {
     func generateUpdaters(_ dataBase: IDataBase) -> FuturePromise<[InformationUpdater]> {
-        let notification = NotificationOutput(
-            type: .newMessage,
-            content: message
+        let notification = NotificationOutput.newMessage(message: message)
+        let pushInfo = PushInfo(
+            title: message.user.name,
+            text: String(message.content.prefix(500))
         )
-        let container = NotificationOutputContainer(notification)
-        return dataBase.run(request: DBGetUserRequest(chatId: message.chatId)).map { [message] users in
-            users.filter { $0.user_id != message.user.userId }.map { user in
-                InformationUpdater(
-                    userId: user.user_id,
-                    container: container,
-                    pushInfo: .init(
-                        title: message.user.name,
-                        text: String(message.content.prefix(100))
-                    )
-                )
+        return dataBase.getAllUpdateTokenForChat(message.chatId, autor: autor).map { tokens in
+            tokens.map { token -> InformationUpdater in
+                if token.userId == autor?.identifier {
+                    let notification = NotificationOutput.newMessage(message: message.convertToSelf())
+                    return InformationUpdater(tokens: [token], output: notification, pushInfo: nil)
+                }
+                return InformationUpdater(tokens: [token], output: notification, pushInfo: pushInfo)
             }
         }
     }

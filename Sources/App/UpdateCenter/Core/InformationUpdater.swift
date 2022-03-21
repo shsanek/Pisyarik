@@ -1,18 +1,26 @@
 import Vapor
 
 final class InformationUpdater {
-    let userId: IdentifierType
-    let container: NotificationOutputContainer
+    let tokens: [Token]
+    let output: NotificationOutput
     let pushInfo: PushInfo?
 
     init(
-        userId: IdentifierType,
-        container: NotificationOutputContainer,
+        tokens: [Token],
+        output: NotificationOutput,
         pushInfo: PushInfo?
     ) {
-        self.userId = userId
-        self.container = container
+        self.tokens = tokens
+        self.output = output
         self.pushInfo = pushInfo
+    }
+}
+
+extension InformationUpdater {
+    struct Token {
+        let userId: IdentifierType
+        let token: String
+        let apns: String?
     }
 }
 
@@ -22,25 +30,17 @@ struct PushInfo {
 }
 
 extension InformationUpdater {
-    func send(token: String, dataBase: IDataBase, app: Application) {
-        guard let pushInfo = pushInfo else {
+    func send(token: String?, dataBase: IDataBase, app: Application) {
+        guard let pushInfo = pushInfo, let token = token else {
             return
         }
-        try? firstly {
-            dataBase.run(request: DBApnsTokenRequest(token: token))
-        }.handle { tokens in
-            for token in tokens {
-                if let id = token.identifier {
-                    app.apns.send(
-                        .init(title: pushInfo.title, subtitle: pushInfo.text),
-                        to: id
-                    ).whenComplete { result in
-                        print(result)
-                    }
-                }
-            }
-        }.make(app.eventLoopGroup.next()).whenComplete { result in
-            print(result)
+        app.apns.send(
+            .init(
+                alert: .init(title: pushInfo.title, body: String(pushInfo.text.prefix(500))),
+                sound: .normal("default")
+            ),
+            to: token
+        ).whenComplete { result in
         }
     }
 }

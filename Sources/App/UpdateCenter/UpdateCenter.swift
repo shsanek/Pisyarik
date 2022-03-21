@@ -33,20 +33,16 @@ final class UpdateCenter {
     }
 
     private func update(_ updaters: [InformationUpdater]) {
+        self.lock.lockReading()
+        let listeners = listeners
+        self.lock.unlock()
         for updater in updaters {
-            try? dataBase.run(request: DBGetUserTokenRequest(userId: updater.userId)).handle { result in
-                self.lock.lockReading()
-                defer {
-                    self.lock.unlock()
+            for token in updater.tokens {
+                if let listener = listeners[token.token] {
+                    listener.append(updater)
                 }
-                for token in result {
-                    if let listener = self.listeners[token.identifier] {
-                        listener.append(updater)
-                    } else {
-                        updater.send(token: token.identifier, dataBase: self.dataBase, app: self.app)
-                    }
-                }
-            }.make(app.eventLoopGroup.next()).whenComplete { _ in }
+                updater.send(token: token.apns, dataBase: self.dataBase, app: self.app)
+            }
         }
     }
 

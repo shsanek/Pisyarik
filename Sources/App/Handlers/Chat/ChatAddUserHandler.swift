@@ -56,6 +56,7 @@ struct ChatAddUserHandler: IRequestHandler {
                 ).only().get { result in
                     parameters.updateCenter.update(
                         action: AddInNewChatAction(
+                            autor: parameters.authorisationInfo,
                             chat: ChatOutput(result, authorisationInfo: nil),
                             userId: parameters.input.userId
                         )

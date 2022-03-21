@@ -43,7 +43,7 @@ extension IDataBase {
                 )
             }
         }.get { output in
-            updateCenter?.update(action: NewMessageAction(message: output))
+            updateCenter?.update(action: NewMessageAction(autor: nil, message: output))
         }
     }
 }

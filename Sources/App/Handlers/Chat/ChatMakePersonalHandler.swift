@@ -69,7 +69,7 @@ struct ChatMakePersonalHandler: IRequestHandler {
             ).get { _ in
                 parameters.updateCenter.update(
                     action: NewPersonalChatAction(
-                        autor: result.me.user.user_id,
+                        autor: me,
                         chat: ChatOutput(
                             name: result.me.user.user_name,
                             chatId: result.chat.chatId,

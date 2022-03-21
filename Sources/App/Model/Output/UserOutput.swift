@@ -1,7 +1,7 @@
 struct UserOutput: Codable {
     let name: String
     let userId: IdentifierType
-    let isSelf: Bool
+    var isSelf: Bool
     let hex: String?
     let emoji: String?
     let firstName: String?
