@@ -4,10 +4,10 @@ struct DBAddTokenForUserRequest: IDBRequest {
     var description: String {
         "Insert token for user"
     }
-    var request: String {
+    func request() throws -> String {
         """
         INSERT INTO token(token, user_id, secret_key)
-        VALUES ('\(token.token_token)', \(token.token_user_id), '\(token.token_secret_key)');
+        VALUES ('\(try token.token_token.safe())', \(token.token_user_id), '\(try token.token_secret_key.safe())');
         SELECT LAST_INSERT_ID () as identifier;
         """
     }

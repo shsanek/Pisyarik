@@ -4,7 +4,7 @@ struct DBUpdateVersionRequest: IDBRequest {
     var description: String {
         "Update BD version value to '\(version)'"
     }
-    var request: String {
+    func request() throws -> String {
         "UPDATE version SET version = \(version) WHERE identifier = 0;"
     }
 

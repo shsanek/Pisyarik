@@ -15,7 +15,7 @@ struct UserLoginHandler: IRequestHandler {
             try CryptoUtils.generateKey(userPublicKey: parameters.input.userPublicKey)
         }
         return firstly {
-            dataBase.run(request: DBGetUserRequest(name: parameters.input.name))
+            dataBase.run(request: try DBGetUserRequest(name: parameters.input.name))
         }.first().handle { user in
             guard user.user_security_hash == String(parameters.input.securityHash.prefix(64)) else {
                 throw Errors.loginErrors.description("Неправильный security_hash")

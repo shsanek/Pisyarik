@@ -26,7 +26,9 @@ extension InformationUpdater {
 
 struct PushInfo {
     let title: String
+    let subtitle: String?
     let text: String
+    let chatId: IdentifierType
 }
 
 extension InformationUpdater {
@@ -35,9 +37,17 @@ extension InformationUpdater {
             return
         }
         app.apns.send(
-            .init(
-                alert: .init(title: pushInfo.title, body: String(pushInfo.text.prefix(500))),
-                sound: .normal("default")
+            Push(
+                aps: .init(
+                    alert: .init(
+                        title: pushInfo.title,
+                        subtitle: pushInfo.subtitle,
+                        body: String(pushInfo.text.prefix(500))
+                    ),
+                    sound: .normal("default"),
+                    threadID: "\(pushInfo.chatId)"
+                ),
+                chatId: pushInfo.chatId
             ),
             to: token
         ).whenComplete { result in

@@ -1,7 +1,7 @@
 struct ChatOutput: Codable {
     let name: String
     let chatId: IdentifierType
-    let type: String
+    let type: ChatType
     let message: MessageOutput?
     let lastMessageId: IdentifierType?
     let notReadCount: Int?
@@ -20,7 +20,7 @@ extension ChatOutput {
             authorisationInfo: authorisationInfo
         )
         self.name = raw.content4.personal_user_name ?? raw.content1.chat_name
-        self.type = raw.content1.chat_type
+        self.type = ChatType(rawValue: raw.content1.chat_type) ?? .unknown
         self.lastMessageId = raw.content5.chat_user_last_read_message_id
         self.notReadCount = raw.content5.chat_user_not_read_message_count
         self.chatId = raw.content1.chat_id
@@ -31,7 +31,7 @@ extension ChatOutput {
     ) {
         self.message = nil
         self.name = raw.chat_name
-        self.type = raw.chat_type
+        self.type = ChatType(rawValue: raw.chat_type) ?? .unknown
         self.lastMessageId = nil
         self.notReadCount = nil
         self.chatId = raw.chat_id

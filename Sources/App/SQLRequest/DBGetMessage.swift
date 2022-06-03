@@ -2,20 +2,24 @@ struct DBGetMessage: IDBRequest {
     typealias Result = DBContainer2<DBUserRaw, DBMessageRaw>
 
     let description: String
-    let request: String
+    private let sql: String
+
+    func request() throws -> String {
+        return sql
+    }
 }
 
 extension DBGetMessage {
     init(limit: Int, chatId: IdentifierType, lastMessage: IdentifierType?, reverse: Bool) {
         self.description = "Get message"
         let sort = reverse ? "ASC" : "DESC"
-        let addedCondition = lastMessage.flatMap { "AND identifier \(reverse ? ">" : "<") \($0)" } ?? ""
+        let addedCondition = lastMessage.flatMap { "AND identifier \(reverse ? ">=" : "<=") \($0)" } ?? ""
         let getMessages = """
             (SELECT * FROM message
             WHERE chat_id = \(chatId) \(addedCondition)
             ORDER BY identifier \(sort) LIMIT \(limit))
             """
-        self.request = """
+        self.sql = """
             SELECT
                 \(DBUserRaw.sqlGET()),
                 \(DBMessageRaw.sqlGET)
@@ -27,7 +31,7 @@ extension DBGetMessage {
 
     init(messageId: IdentifierType) {
         self.description = "Get message"
-        self.request = """
+        self.sql = """
             SELECT
                 \(DBUserRaw.sqlGET()),
                 \(DBMessageRaw.sqlGET)

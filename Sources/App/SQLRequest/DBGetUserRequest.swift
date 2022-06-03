@@ -2,28 +2,32 @@ struct DBGetUserRequest: IDBRequest {
     typealias Result = DBUserRaw
 
     let description: String
-    let request: String
+    private let sql: String
+
+    func request() throws -> String {
+        return sql
+    }
 }
 
 extension DBGetUserRequest {
-    init(name: String) {
+    init(name: String) throws {
         self.description = "Get user with name '\(name)'"
-        self.request = "SELECT \(DBUserRaw.sqlGET(true)) FROM user WHERE name = '\(name)';"
+        self.sql = "SELECT \(DBUserRaw.sqlGET(true)) FROM user WHERE name = '\(try name.safe())';"
     }
 
     init(userId: IdentifierType) {
         self.description = "Get user with name '\(userId)'"
-        self.request = "SELECT \(DBUserRaw.sqlGET()) FROM user WHERE identifier = \(userId);"
+        self.sql = "SELECT \(DBUserRaw.sqlGET()) FROM user WHERE identifier = \(userId);"
     }
 
-    init(contains name: String) {
-        self.description = "Get users with name contains '\(name)'"
-        self.request = "SELECT \(DBUserRaw.sqlGET()) FROM user WHERE LOWER(name) LIKE '%\(name.lowercased())%' LIMIT 50;"
+    init(contains name: String) throws {
+        self.description = "Get users with name contains '\(try name.safe())'"
+        self.sql = "SELECT \(DBUserRaw.sqlGET()) FROM user WHERE LOWER(name) LIKE '%\(name.lowercased())%' LIMIT 50;"
     }
 
     init(chatId: IdentifierType) {
         self.description = "Get users in chat id '\(chatId)'"
-        self.request = """
+        self.sql = """
             SELECT
                 \(DBUserRaw.sqlGET())
             FROM chat_user, user

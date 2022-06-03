@@ -5,8 +5,8 @@ struct DBUpdateApnsRequest: IDBRequest {
         "added apns"
     }
 
-    var request: String {
-        "UPDATE token SET apns_token = '\(apnsToken)' WHERE token = '\(token)';"
+    func request() throws -> String {
+        "UPDATE token SET apns_token = '\(try apnsToken.safe())' WHERE token = '\(try token.safe())';"
     }
 
     private let apnsToken: String

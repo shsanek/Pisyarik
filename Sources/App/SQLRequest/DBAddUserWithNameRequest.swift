@@ -4,10 +4,10 @@ struct DBAddUserWithNameRequest: IDBRequest {
     var description: String {
         "Make user with user"
     }
-    var request: String {
+    func request() throws -> String {
         """
         INSERT INTO user(name, security_hash)
-        VALUES ('\(name)','\(securityHash)');
+        VALUES ('\(try name.safe())','\(try securityHash.safe())');
         SELECT LAST_INSERT_ID () as identifier;
         """
     }

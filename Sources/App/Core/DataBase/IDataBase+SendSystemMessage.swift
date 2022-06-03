@@ -43,7 +43,8 @@ extension IDataBase {
                 )
             }
         }.get { output in
-            updateCenter?.update(action: NewMessageAction(autor: nil, message: output))
+            updateCenter?.update(
+                action: NewMessageAction(autor: nil, message: output, chatId: nil))
         }
     }
 }

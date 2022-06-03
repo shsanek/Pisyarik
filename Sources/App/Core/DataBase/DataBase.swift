@@ -110,7 +110,11 @@ final class DataBase {
 
 extension DataBase: IDataBase {
     func run<Request: IDBRequest>(request: Request) -> FuturePromise<[Request.Result]> {
-        return self.perform(request.request, description: request.description)
+        do {
+            return self.perform(try request.request(), description: request.description)
+        } catch {
+            return .error(error)
+        }
     }
 }
 
@@ -139,5 +143,5 @@ protocol IDBRequest {
     associatedtype Result: Decodable
 
     var description: String { get }
-    var request: String { get }
+    func request() throws -> String
 }

@@ -2,13 +2,17 @@ struct DBGetChatRequest: IDBRequest {
     typealias Result = DBContainer5<DBChatRaw, DBMessageRaw, DBUserRaw, DBPersonalNameRaw, DBChatUserRaw>
 
     let description: String
-    let request: String
+    private let sql: String
+
+    func request() throws -> String {
+        return sql
+    }
 }
 
 extension DBGetChatRequest {
-    init(userId: IdentifierType, personalChatName: String? = nil) {
+    init(userId: IdentifierType, personalChatName: String? = nil) throws {
         self.description = "Get chat with user id '\(userId)'"
-        self.request = """
+        self.sql = """
             SELECT
                    \(DBUserRaw.sqlGET()),
                    \(DBMessageRaw.sqlGET),
@@ -20,7 +24,7 @@ extension DBGetChatRequest {
                     ON
                         chat.identifier = chat_user.chat_id AND
                         chat_user.user_id = \(userId)
-                        \(personalChatName.flatMap { "AND chat.name = '\($0)'" } ?? "")
+                        \(try personalChatName.flatMap { "AND chat.name = '\(try $0.safe())'" } ?? "")
 
                     INNER JOIN message
                     ON chat.last_message_id = message.identifier
@@ -42,7 +46,7 @@ extension DBGetChatRequest {
 
     init(chatId: IdentifierType, userId: IdentifierType) {
         self.description = "Get chats with id '\(chatId)' for user \(userId)"
-        self.request = """
+        self.sql = """
             SELECT
                 \(DBUserRaw.sqlGET()),
                 \(DBMessageRaw.sqlGET),
@@ -79,20 +83,24 @@ struct DBGetLightChatRequest: IDBRequest {
     typealias Result = DBChatRaw
 
     let description: String
-    let request: String
+    private let sql: String
 
-    init(name: String) {
-        self.description = "Get chats with name = '\(name)'"
-        self.request = "SELECT \(DBChatRaw.sqlGET) FROM chat WHERE name = '\(name)';"
+    func request() throws -> String {
+        return sql
     }
 
-    init(contains name: String) {
+    init(name: String) throws {
+        self.description = "Get chats with name = '\(name)'"
+        self.sql = "SELECT \(DBChatRaw.sqlGET) FROM chat WHERE name = '\(try name.safe())';"
+    }
+
+    init(contains name: String) throws {
         self.description = "Get chats with name contains '\(name)'"
-        self.request = "SELECT \(DBChatRaw.sqlGET) FROM chat WHERE name LIKE BINARY '%\(name)%';"
+        self.sql = "SELECT \(DBChatRaw.sqlGET) FROM chat WHERE name LIKE BINARY '%\(try name.safe())%';"
     }
 
     init(chatId: IdentifierType) {
         self.description = "Get chats with id '\(chatId)'"
-        self.request = "SELECT \(DBChatRaw.sqlGET) FROM chat WHERE identifier = \(chatId);"
+        self.sql = "SELECT \(DBChatRaw.sqlGET) FROM chat WHERE identifier = \(chatId);"
     }
 }

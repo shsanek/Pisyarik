@@ -4,7 +4,7 @@ struct DBUpdateReadMessageRequest: IDBRequest {
     var description: String {
         "Update read message"
     }
-    var request: String {
+    func request() throws -> String {
         """
         SET @last_update_count = (
             SELECT COUNT(*)

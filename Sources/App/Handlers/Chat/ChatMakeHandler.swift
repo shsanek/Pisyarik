@@ -20,7 +20,7 @@ struct ChatMakeHandler: IRequestHandler {
             }
             return Void()
         }.next {
-            dataBase.run(request: DBGetLightChatRequest(name: parameters.input.name))
+            dataBase.run(request: try DBGetLightChatRequest(name: parameters.input.name))
         }.next {
             dataBase.run(request: DBAddChatRequest(name: parameters.input.name, type: self.type.rawValue))
         }.only().then { chat -> FuturePromise<Output> in
@@ -37,7 +37,7 @@ struct ChatMakeHandler: IRequestHandler {
                 ChatOutput(
                     name: parameters.input.name,
                     chatId: chat.identifier,
-                    type: ChatType.group.rawValue,
+                    type: ChatType.group,
                     message: message,
                     lastMessageId: nil,
                     notReadCount: 0

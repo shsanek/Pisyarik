@@ -69,7 +69,7 @@ extension RequestHandlerContainer: IRequestHandlerContainer {
         }
         let token = authorisation.token
         let secret = authorisation.secretKey
-        return dataBase.run(request: DBGetTokenUserRequest(token: token)).only().handle { container in
+        return dataBase.run(request: try DBGetTokenUserRequest(token: token)).only().handle { container in
             let secret_key = String(container.content2.token_secret_key.hash(with: raw.time)?.prefix(64) ?? "")
             guard
                 secret_key == String(secret.prefix(64))

@@ -9,7 +9,7 @@ struct NewPersonalChatAction {
 extension NewPersonalChatAction: IUpdateAction {
     func generateUpdaters(_ dataBase: IDataBase) -> FuturePromise<[InformationUpdater]> {
         let notification = NotificationOutput.newChat(chat: chat)
-        let pushInfo = PushInfo(title: "\(chat.name)", text: "Начал диалог")
+        let pushInfo = PushInfo(title: "\(chat.name)", subtitle: nil, text: "Начал диалог", chatId: chat.chatId)
         return dataBase.getAllUpdateTokenForChat(chat.chatId, autor: autor).map { tokens in
             return [InformationUpdater(tokens: tokens, output: notification, pushInfo: pushInfo)]
         }

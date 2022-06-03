@@ -4,10 +4,11 @@ struct DBAddChatRequest: IDBRequest {
     var description: String {
         "Add new chat '\(name)'"
     }
-    var request: String {
+
+    func request() throws -> String {
         """
         INSERT INTO chat(name, type)
-        VALUES ('\(name)', '\(type)');
+        VALUES ('\(try name.safe())', '\(try type.safe())');
         SELECT LAST_INSERT_ID () as identifier;
         """
     }

@@ -20,7 +20,7 @@ struct UserRegistrationHandler: IRequestHandler {
             try CryptoUtils.generateKey(userPublicKey: parameters.input.userPublicKey)
         }
 
-        return dataBase.run(request: DBGetUserRequest(name: parameters.input.name)).handle { result in
+        return dataBase.run(request: try DBGetUserRequest(name: parameters.input.name)).handle { result in
             if result.count != 0 {
                 throw Errors.alreadyLogin.description("Пользователь с таким именем уже существует")
             }

@@ -4,7 +4,7 @@ struct DBAddUserInChatRequest: IDBRequest {
     var description: String {
         "Add user in chat"
     }
-    var request: String {
+    func request() throws -> String {
         """
         SET @last_message_id = (SELECT last_message_id as id FROM chat WHERE identifier = \(chatId));
         INSERT INTO chat_user(user_id, chat_id, last_read_message_id)

@@ -4,19 +4,19 @@ struct DBUpdateUserRequest: IDBRequest {
     var description: String {
         "Update user info"
     }
-    var request: String {
+    func request() throws -> String {
         var changes = [(label: String, value: String)]()
         if let user_first_name = user.user_first_name {
-            changes.append((label: "first_name", value: "'\(user_first_name)'"))
+            changes.append((label: "first_name", value: "'\(try user_first_name.safe())'"))
         }
         if let user_last_name = user.user_last_name {
-            changes.append((label: "last_name", value: "'\(user_last_name)'"))
+            changes.append((label: "last_name", value: "'\(try user_last_name.safe())'"))
         }
         if let user_emoji = user.user_emoji {
-            changes.append((label: "emoji", value: "'\(user_emoji)'"))
+            changes.append((label: "emoji", value: "'\(try user_emoji.safe())'"))
         }
         if let user_background_hex = user.user_background_hex {
-            changes.append((label: "background_hex", value: "'\(user_background_hex)'"))
+            changes.append((label: "background_hex", value: "'\(try user_background_hex.safe())'"))
         }
         return """
             UPDATE user

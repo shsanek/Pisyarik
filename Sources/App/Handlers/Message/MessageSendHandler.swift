@@ -45,7 +45,8 @@ struct MessageSendHandler: IRequestHandler {
                             type: parameters.input.type,
                             messageId: identifier.identifier,
                             chatId: parameters.input.chatId
-                        )
+                        ),
+                        chatId: parameters.input.chatId
                     )
                 )
             }

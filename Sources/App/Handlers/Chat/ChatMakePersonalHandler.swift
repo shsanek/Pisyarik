@@ -14,7 +14,7 @@ struct ChatMakePersonalHandler: IRequestHandler {
                 return .value("SYS ##\(identifiers.joined(separator: "-"))##")
             }.map { name in
                 dataBase.run(
-                    request: DBGetChatRequest.init(
+                    request: try DBGetChatRequest.init(
                         userId: result.me.identifier,
                         personalChatName: name
                     )
@@ -73,7 +73,7 @@ struct ChatMakePersonalHandler: IRequestHandler {
                         chat: ChatOutput(
                             name: result.me.user.user_name,
                             chatId: result.chat.chatId,
-                            type: ChatType.personal.rawValue,
+                            type: ChatType.personal,
                             message: result.chat.message,
                             lastMessageId: nil,
                             notReadCount: 0
@@ -85,7 +85,7 @@ struct ChatMakePersonalHandler: IRequestHandler {
                 ChatOutput(
                     name: result.user.user_name,
                     chatId: result.chat.chatId,
-                    type: ChatType.personal.rawValue,
+                    type: ChatType.personal,
                     message: result.chat.message,
                     lastMessageId: nil,
                     notReadCount: 0

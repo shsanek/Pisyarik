@@ -4,15 +4,16 @@ struct DBAddMessageRequest: IDBRequest {
     var description: String {
         "Add new message"
     }
-    var request: String {
+
+    func request() throws -> String {
         """
         INSERT INTO message(user_id, chat_id, body, date, type)
         VALUES (
             \(message.message_author_id),
             \(message.message_chat_id),
-            '\(message.message_body)',
+            '\(try message.message_body.safe())',
             \(message.message_date),
-            '\(message.message_type)'
+            '\(try message.message_type.safe())'
         );
 
         SET @last_identifier = LAST_INSERT_ID ();

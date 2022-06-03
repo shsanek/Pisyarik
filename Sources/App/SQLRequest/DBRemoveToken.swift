@@ -1,11 +1,13 @@
 struct DBRemoveToken: IDBRequest {
     typealias Result = EmptyRaw
 
-    let description: String
-    let request: String
+    let token: String
 
-    init(token: String) {
-        self.request = "DELETE FROM token WHERE token.token = '\(token)';"
-        self.description = "Remove token"
+    var description: String {
+        "Remove token"
+    }
+
+    func request() throws -> String {
+        return "DELETE FROM token WHERE token.token = '\(try token.safe())';"
     }
 }

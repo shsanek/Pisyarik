@@ -4,7 +4,7 @@ import APNS
 import NIOSSL
 
 #if !os(macOS)
-DebugeNotificationCenter.setup(token: "", chatID: "")
+DebugeNotificationCenter.setup(token: "2113672539:AAFxEFUPQh4QLrP72OKJ7SocRVh7yP0w2oQ", chatID: "-543384352")
 #endif
 
 DebugeNotificationCenter.send("Запускаю сервер...")

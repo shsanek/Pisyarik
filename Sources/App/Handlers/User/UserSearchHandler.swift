@@ -5,7 +5,7 @@ struct UserSearchHandler: IRequestHandler {
 
     func handle(_ parameters: RequestParameters<Input>, dataBase: IDataBase) throws -> FuturePromise<UserListOutput> {
         parameters.onlyLogin.then { parameters in
-            dataBase.run(request: DBGetUserRequest(contains: parameters.input.name))
+            dataBase.run(request: try DBGetUserRequest(contains: parameters.input.name))
         }.map { result in
             UserListOutput(result, authorisationInfo: parameters.authorisationInfo)
         }

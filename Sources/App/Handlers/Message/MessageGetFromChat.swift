@@ -34,7 +34,7 @@ struct MessageGetFromChat: IRequestHandler {
         }.next {
             dataBase.run(
                 request: DBGetMessage(
-                    limit: max(100, parameters.input.limit),
+                    limit: min(100, parameters.input.limit),
                     chatId: parameters.input.chatId,
                     lastMessage: parameters.input.lastMessageId,
                     reverse: parameters.input.reverse ?? false
